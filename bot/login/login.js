@@ -2,12 +2,12 @@
 process.stdout.write("\x1b]2;Goat Bot V2 - Made by NTKhang\x1b\x5c");
 const defaultRequire = require;
 
-function decode(text) {
+/*function decode(text) {
 	text = Buffer.from(text, 'hex').toString('utf-8');
 	text = Buffer.from(text, 'hex').toString('utf-8');
 	text = Buffer.from(text, 'base64').toString('utf-8');
 	return text;
-}
+}*/
 
 const gradient = defaultRequire("gradient-string");
 const axios = defaultRequire("axios");
@@ -18,7 +18,6 @@ const toptp = defaultRequire("totp-generator");
 const login = defaultRequire(`${process.cwd()}/fb-chat-api`);
 const qr = new (defaultRequire("qrcode-reader"));
 const Canvas = defaultRequire("canvas");
-const https = defaultRequire("https");
 
 async function getName(userID) {
 	try {
@@ -46,7 +45,7 @@ function compareVersion(version1, version2) {
 const { writeFileSync, readFileSync, existsSync, watch } = require("fs-extra");
 const handlerWhenListenHasError = require("./handlerWhenListenHasError.js");
 const checkLiveCookie = require("./checkLiveCookie.js");
-const { callbackListenTime, storage5Message } = global.GoatBot;
+const { callbackListenTime, storage5Message } = global.BruxaBot;
 const { log, logColor, getPrefix, createOraDots, jsonStringifyColor, getText, convertTime, colors, randomString } = global.utils;
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -80,7 +79,7 @@ const titles = [
 		"G O A T B O T  V 2 @" + currentVersion
 	],
 	[
-		"GOATBOT V2"
+		"BruxaBot V2"
 	]
 ];
 const maxWidth = process.stdout.columns;
@@ -98,7 +97,7 @@ for (const text of title) {
 	const textColor = gradient("#FA8BFF", "#2BD2FF", "#2BFF88")(text);
 	centerText(textColor, text.length);
 }
-let subTitle = `GoatBot V2@${currentVersion}- A simple Bot chat messenger use personal account`;
+let subTitle = `BruxaBot V2@${currentVersion}- A simple Bot chat messenger use personal account`;
 const subTitleArray = [];
 if (subTitle.length > maxWidth) {
 	while (subTitle.length > maxWidth) {
@@ -197,8 +196,8 @@ qr.readQrCode = async function (filePath) {
 };
 
 const { dirAccount } = global.client;
-// const { config, configCommands } = global.GoatBot;
-const { facebookAccount } = global.GoatBot.config;
+// const { config, configCommands } = global.BruxaBot;
+const { facebookAccount } = global.BruxaBot.config;
 
 function responseUptimeSuccess(req, res) {
 	res.type('json').send({
@@ -345,8 +344,8 @@ async function getAppStateFromEmail(spin = { _start: () => { }, _stop: () => { }
 		appState = filterKeysAppState(appState);
 	}
 
-	global.GoatBot.config.facebookAccount['2FASecret'] = code2FATemp || "";
-	writeFileSync(global.client.dirConfig, JSON.stringify(global.GoatBot.config, null, 2));
+	global.BruxaBot.config.facebookAccount['2FASecret'] = code2FATemp || "";
+	writeFileSync(global.client.dirConfig, JSON.stringify(global.BruxaBot.config, null, 2));
 	return appState;
 }
 
@@ -449,13 +448,13 @@ async function getAppStateToLogin(loginWithEmail) {
 				!splitAccountText.slice(0, 2).map(i => i.trim()).some(i => i.includes(' '))
 			) {
 				// bug if account.txt is "[]"
-				global.GoatBot.config.facebookAccount.email = splitAccountText[0]; // bug here=> email is "["
-				global.GoatBot.config.facebookAccount.password = splitAccountText[1]; // bug here=> password is "]"
+				global.BruxaBot.config.facebookAccount.email = splitAccountText[0]; // bug here=> email is "["
+				global.BruxaBot.config.facebookAccount.password = splitAccountText[1]; // bug here=> password is "]"
 				if (splitAccountText[2]) {
 					const code2FATemp = splitAccountText[2].replace(/ /g, "");
-					global.GoatBot.config.facebookAccount['2FASecret'] = code2FATemp;
+					global.BruxaBot.config.facebookAccount['2FASecret'] = code2FATemp;
 				}
-				writeFileSync(global.client.dirConfig, JSON.stringify(global.GoatBot.config, null, 2));
+				writeFileSync(global.client.dirConfig, JSON.stringify(global.BruxaBot.config, null, 2));
 			}
 			// is json (cookies or appstate)
 			else {
@@ -539,7 +538,7 @@ async function getAppStateToLogin(loginWithEmail) {
 						const number = parseInt(key.name);
 						if (number >= 0 && number <= options.length)
 							currentOption = number - 1;
-						process.stdout.write('\033[1D'); // delete the character
+						process.stdout.write('\x1b[1D'); // delete the character
 					}
 					else if (key.name === 'enter' || key.name === 'return') {
 						rl.input.removeAllListeners('keypress');
@@ -549,7 +548,7 @@ async function getAppStateToLogin(loginWithEmail) {
 						resolve();
 					}
 					else {
-						process.stdout.write('\033[1D'); // delete the character
+						process.stdout.write('\x1b[1D'); // delete the character
 					}
 
 					clearLines(options.length);
@@ -569,7 +568,7 @@ async function getAppStateToLogin(loginWithEmail) {
 				facebookAccount.email = email || '';
 				facebookAccount.password = password || '';
 				facebookAccount['2FASecret'] = twoFactorAuth || '';
-				writeFileSync(global.client.dirConfig, JSON.stringify(global.GoatBot.config, null, 2));
+				writeFileSync(global.client.dirConfig, JSON.stringify(global.BruxaBot.config, null, 2));
 			}
 			else if (currentOption == 1) {
 				const token = await input(getText('login', 'inputToken') + " ");
@@ -607,7 +606,7 @@ async function getAppStateToLogin(loginWithEmail) {
 function stopListening(keyListen) {
 	keyListen = keyListen || Object.keys(callbackListenTime).pop();
 	return new Promise((resolve) => {
-		global.GoatBot.fcaApi.stopListening?.(() => {
+		global.BruxaBot.fcaApi.stopListening?.(() => {
 			if (callbackListenTime[keyListen]) {
 				// callbackListenTime[keyListen || Object.keys(callbackListenTime).pop()]("Connection closed by user.");
 				callbackListenTime[keyListen] = () => { };
@@ -634,7 +633,7 @@ async function startBot(loginWithEmail) {
 	}
 	/* { CHECK ORIGIN CODE } */
 
-	if (global.GoatBot.Listening)
+	if (global.BruxaBot.Listening)
 		await stopListening();
 
 	log.info("LOGIN FACEBOOK", getText('login', 'currentlyLogged'));
@@ -646,13 +645,13 @@ async function startBot(loginWithEmail) {
 	setTimeout(() => changeFbStateByCode = false, 1000);
 	// ——————————————————— LOGIN ———————————————————— //
 	(function loginBot(appState) {
-		global.GoatBot.commands = new Map();
-		global.GoatBot.eventCommands = new Map();
-		global.GoatBot.aliases = new Map();
-		global.GoatBot.onChat = [];
-		global.GoatBot.onEvent = [];
-		global.GoatBot.onReply = new Map();
-		global.GoatBot.onReaction = new Map();
+		global.BruxaBot.commands = new Map();
+		global.BruxaBot.eventCommands = new Map();
+		global.BruxaBot.aliases = new Map();
+		global.BruxaBot.onChat = [];
+		global.BruxaBot.onEvent = [];
+		global.BruxaBot.onReply = new Map();
+		global.BruxaBot.onReaction = new Map();
 		clearInterval(global.intervalRestartListenMqtt);
 		delete global.intervalRestartListenMqtt;
 
@@ -661,7 +660,7 @@ async function startBot(loginWithEmail) {
 
 		let isSendNotiErrorMessage = false;
 
-		login({ appState }, global.GoatBot.config.optionsFca, async function (error, api) {
+		login({ appState }, global.BruxaBot.config.optionsFca, async function (error, api) {
 			if (!isNaN(facebookAccount.intervalGetNewCookie) && facebookAccount.intervalGetNewCookie > 0)
 				if (facebookAccount.email && facebookAccount.password) {
 					spin?._stop();
@@ -698,7 +697,7 @@ async function startBot(loginWithEmail) {
 					return startBot(true);
 				}
 				// —————————— CHECK DASHBOARD —————————— //
-				if (global.GoatBot.config.dashBoard?.enable == true) {
+				if (global.BruxaBot.config.dashBoard?.enable == true) {
 					try {
 						await require("../../dashboard/app.js")(null);
 						log.info("DASHBOARD", getText('login', 'openDashboardSuccess'));
@@ -713,18 +712,27 @@ async function startBot(loginWithEmail) {
 				}
 			}
 
-			global.GoatBot.fcaApi = api;
-			global.GoatBot.botID = api.getCurrentUserID();
+			global.BruxaBot.fcaApi = api;
+			global.BruxaBot.botID = api.getCurrentUserID();
 			log.info("LOGIN FACEBOOK", getText('login', 'loginSuccess'));
+
 			let hasBanned = false;
 			global.botID = api.getCurrentUserID();
 			logColor("#f5ab00", createLine("BOT INFO"));
 			log.info("NODE VERSION", process.version);
 			log.info("PROJECT VERSION", currentVersion);
 			log.info("BOT ID", `${global.botID} - ${await getName(global.botID)}`);
-			log.info("PREFIX", global.GoatBot.config.prefix);
-			log.info("LANGUAGE", global.GoatBot.config.language);
-			log.info("BOT NICK NAME", global.GoatBot.config.nickNameBot || "GOAT BOT");
+			log.info("PREFIX", global.BruxaBot.config.prefix);
+			log.info("LANGUAGE", global.BruxaBot.config.language);
+			log.info("BOT NICK NAME", global.BruxaBot.config.nickNameBot || "BRUXA BOT");
+			// -------------------------- fca option ----------------------
+			
+
+
+
+
+
+
 			// ———————————————————— GBAN ————————————————————— //
 			let dataGban;
 
@@ -749,7 +757,7 @@ async function startBot(loginWithEmail) {
 					}
 				}
 				// ———————————————— CHECK ADMIN ———————————————— //
-				for (const idad of global.GoatBot.config.adminBot) {
+				for (const idad of global.BruxaBot.config.adminBot) {
 					if (dataGban.hasOwnProperty(idad)) {
 						if (!dataGban[idad].toDate) {
 							log.err('GBAN', getText('login', 'gbanMessage', dataGban[idad].date, dataGban[idad].reason, dataGban[idad].date));
@@ -782,7 +790,7 @@ async function startBot(loginWithEmail) {
 				log.err("ERROR", "Can't get notifications data");
 				process.exit();
 			}
-			if (global.GoatBot.config.autoRefreshFbstate == true) {
+			if (global.BruxaBot.config.autoRefreshFbstate == true) {
 				changeFbStateByCode = true;
 				try {
 					writeFileSync(dirAccount, JSON.stringify(filterKeysAppState(api.getAppState()), null, 2));
@@ -798,15 +806,15 @@ async function startBot(loginWithEmail) {
 				process.exit();
 			}
 			// ——————————————————— LOAD DATA ——————————————————— //
-			const { threadModel, userModel, dashBoardModel, globalModel, threadsData, usersData, dashBoardData, globalData, sequelize } = await require(process.env.NODE_ENV === 'development' ? "./loadData.dev.js" : "./loadData.js")(api, createLine);
+			const { threadModel, userModel, dashBoardModel, globalModel, threadsData, usersData, dashBoardData, globalData } = await require(process.env.NODE_ENV === 'development' ? "./loadData.dev.js" : "./loadData.js")(api, createLine);
 			// ————————————————— CUSTOM SCRIPTS ————————————————— //
 			await require("../custom.js")({ api, threadModel, userModel, dashBoardModel, globalModel, threadsData, usersData, dashBoardData, globalData, getText });
 			// —————————————————— LOAD SCRIPTS —————————————————— //
 			await require(process.env.NODE_ENV === 'development' ? "./loadScripts.dev.js" : "./loadScripts.js")(api, threadModel, userModel, dashBoardModel, globalModel, threadsData, usersData, dashBoardData, globalData, createLine);
 			// ———————————— CHECK AUTO LOAD SCRIPTS ———————————— //
-			if (global.GoatBot.config.autoLoadScripts?.enable == true) {
-				const ignoreCmds = global.GoatBot.config.autoLoadScripts.ignoreCmds?.replace(/[ ,]+/g, ' ').trim().split(' ') || [];
-				const ignoreEvents = global.GoatBot.config.autoLoadScripts.ignoreEvents?.replace(/[ ,]+/g, ' ').trim().split(' ') || [];
+			if (global.BruxaBot.config.autoLoadScripts?.enable == true) {
+				const ignoreCmds = global.BruxaBot.config.autoLoadScripts.ignoreCmds?.replace(/[ ,]+/g, ' ').trim().split(' ') || [];
+				const ignoreEvents = global.BruxaBot.config.autoLoadScripts.ignoreEvents?.replace(/[ ,]+/g, ' ').trim().split(' ') || [];
 
 				watch(`${process.cwd()}/scripts/cmds`, async (event, filename) => {
 					if (filename.endsWith('.js')) {
@@ -821,7 +829,7 @@ async function startBot(loginWithEmail) {
 								global.temp.contentScripts.cmds[filename] = currentContent;
 								filename = filename.replace('.js', '');
 
-								const infoLoad = global.utils.loadScripts("cmds", filename, log, global.GoatBot.configCommands, api, threadModel, userModel, dashBoardModel, globalModel, threadsData, usersData, dashBoardData, globalData);
+								const infoLoad = global.utils.loadScripts("cmds", filename, log, global.BruxaBot.configCommands, api, threadModel, userModel, dashBoardModel, globalModel, threadsData, usersData, dashBoardData, globalData);
 								if (infoLoad.status == "success")
 									log.master("AUTO LOAD SCRIPTS", `Command ${filename}.js (${infoLoad.command.config.name}) has been reloaded`);
 								else
@@ -847,7 +855,7 @@ async function startBot(loginWithEmail) {
 								global.temp.contentScripts.events[filename] = currentContent;
 								filename = filename.replace('.js', '');
 
-								const infoLoad = global.utils.loadScripts("events", filename, log, global.GoatBot.configCommands, api, threadModel, userModel, dashBoardModel, globalModel, threadsData, usersData, dashBoardData, globalData);
+								const infoLoad = global.utils.loadScripts("events", filename, log, global.BruxaBot.configCommands, api, threadModel, userModel, dashBoardModel, globalModel, threadsData, usersData, dashBoardData, globalData);
 								if (infoLoad.status == "success")
 									log.master("AUTO LOAD SCRIPTS", `Event ${filename}.js (${infoLoad.command.config.name}) has been reloaded`);
 								else
@@ -861,7 +869,7 @@ async function startBot(loginWithEmail) {
 				});
 			}
 			// ——————————————————— DASHBOARD ——————————————————— //
-			if (global.GoatBot.config.dashBoard?.enable == true && dashBoardIsRunning == false) {
+			if (global.BruxaBot.config.dashBoard?.enable == true && dashBoardIsRunning == false) {
 				logColor('#f5ab00', createLine('DASHBOARD'));
 				try {
 					await require("../../dashboard/app.js")(api);
@@ -875,7 +883,7 @@ async function startBot(loginWithEmail) {
 			// ———————————————————— ADMIN BOT ———————————————————— //
 			logColor('#f5ab00', character);
 			let i = 0;
-			const adminBot = global.GoatBot.config.adminBot
+			const adminBot = global.BruxaBot.config.adminBot
 				.filter(item => !isNaN(item))
 				.map(item => item = item.toString());
 			for (const uid of adminBot) {
@@ -889,18 +897,18 @@ async function startBot(loginWithEmail) {
 			}
 			log.master("NOTIFICATION", (notification || "").trim());
 			log.master("SUCCESS", getText('login', 'runBot'));
-			log.master("LOAD TIME", `${convertTime(Date.now() - global.GoatBot.startTime)}`);
+			log.master("LOAD TIME", `${convertTime(Date.now() - global.BruxaBot.startTime)}`);
 			logColor("#f5ab00", createLine("COPYRIGHT"));
 			// —————————————————— COPYRIGHT INFO —————————————————— //
-			// console.log(`\x1b[1m\x1b[33mCOPYRIGHT:\x1b[0m\x1b[1m\x1b[37m \x1b[0m\x1b[1m\x1b[36mProject GoatBot v2 created by ntkhang03 (https://github.com/ntkhang03), please do not sell this source code or claim it as your own. Thank you!\x1b[0m`);
-			console.log(`\x1b[1m\x1b[33m${("COPYRIGHT:")}\x1b[0m\x1b[1m\x1b[37m \x1b[0m\x1b[1m\x1b[36m${("Project GoatBot v2 created by ntkhang03 (https://github.com/ntkhang03), please do not sell this source code or claim it as your own. Thank you!")}\x1b[0m`);
+			// console.log(`\x1b[1m\x1b[33mCOPYRIGHT:\x1b[0m\x1b[1m\x1b[37m \x1b[0m\x1b[1m\x1b[36mProject BruxaBot v2 created by ntkhang03 (https://github.com/ntkhang03), please do not sell this source code or claim it as your own. Thank you!\x1b[0m`);
+			console.log(`\x1b[1m\x1b[33m${("COPYRIGHT:")}\x1b[0m\x1b[1m\x1b[37m \x1b[0m\x1b[1m\x1b[36m${("Project BruxaBot v2 created by ntkhang03 (https://github.com/ntkhang03), please do not sell this source code or claim it as your own. Thank you!")}\x1b[0m`);
 			logColor("#f5ab00", character);
-			global.GoatBot.config.adminBot = adminBot;
-			writeFileSync(global.client.dirConfig, JSON.stringify(global.GoatBot.config, null, 2));
-			writeFileSync(global.client.dirConfigCommands, JSON.stringify(global.GoatBot.configCommands, null, 2));
+			global.BruxaBot.config.adminBot = adminBot;
+			writeFileSync(global.client.dirConfig, JSON.stringify(global.BruxaBot.config, null, 2));
+			writeFileSync(global.client.dirConfigCommands, JSON.stringify(global.BruxaBot.configCommands, null, 2));
 
 			// ——————————————————————————————————————————————————— //
-			const { restartListenMqtt } = global.GoatBot.config;
+			const { restartListenMqtt } = global.BruxaBot.config;
 			let intervalCheckLiveCookieAndRelogin = false;
 			// —————————————————— CALLBACK LISTEN —————————————————— //
 			async function callBackListen(error, event) {
@@ -919,7 +927,7 @@ async function startBot(loginWithEmail) {
 							isSendNotiErrorMessage = true;
 						}
 
-						if (global.GoatBot.config.autoRestartWhenListenMqttError)
+						if (global.BruxaBot.config.autoRestartWhenListenMqttError)
 							process.exit(2);
 						else {
 							// log.dev("ACCOUNT LOCKED, start relogin...");
@@ -952,7 +960,7 @@ async function startBot(loginWithEmail) {
 										intervalCheckLiveCookieAndRelogin = false;
 										const keyListen = Date.now();
 										isSendNotiErrorMessage = false;
-										global.GoatBot.Listening = api.listenMqtt(createCallBackListen(keyListen));
+										global.BruxaBot.Listening = api.listenMqtt(createCallBackListen(keyListen));
 									}
 								}, 5000);
 							}
@@ -969,7 +977,7 @@ async function startBot(loginWithEmail) {
 				}
 				global.responseUptimeCurrent = responseUptimeSuccess;
 				global.statusAccountBot = 'good';
-				const configLog = global.GoatBot.config.logEvents;
+				const configLog = global.BruxaBot.config.logEvents;
 				if (isSendNotiErrorMessage == true)
 					isSendNotiErrorMessage = false;
 
@@ -1000,31 +1008,31 @@ async function startBot(loginWithEmail) {
 				// }
 
 				if (
-					global.GoatBot.config.whiteListMode?.enable == true
-					&& global.GoatBot.config.whiteListModeThread?.enable == true
+					global.BruxaBot.config.whiteListMode?.enable == true
+					&& global.BruxaBot.config.whiteListModeThread?.enable == true
 					// admin
-					&& !global.GoatBot.config.adminBot.includes(event.senderID)
+					&& !global.BruxaBot.config.adminBot.includes(event.senderID)
 				) {
 					if (
-						!global.GoatBot.config.whiteListMode.whiteListIds.includes(event.senderID)
-						&& !global.GoatBot.config.whiteListModeThread.whiteListThreadIds.includes(event.threadID)
+						!global.BruxaBot.config.whiteListMode.whiteListIds.includes(event.senderID)
+						&& !global.BruxaBot.config.whiteListModeThread.whiteListThreadIds.includes(event.threadID)
 						// admin
-						&& !global.GoatBot.config.adminBot.includes(event.senderID)
+						&& !global.BruxaBot.config.adminBot.includes(event.senderID)
 					)
 						return;
 				}
 				else if (
-					global.GoatBot.config.whiteListMode?.enable == true
-					&& !global.GoatBot.config.whiteListMode.whiteListIds.includes(event.senderID)
+					global.BruxaBot.config.whiteListMode?.enable == true
+					&& !global.BruxaBot.config.whiteListMode.whiteListIds.includes(event.senderID)
 					// admin
-					&& !global.GoatBot.config.adminBot.includes(event.senderID)
+					&& !global.BruxaBot.config.adminBot.includes(event.senderID)
 				)
 					return;
 				else if (
-					global.GoatBot.config.whiteListModeThread?.enable == true
-					&& !global.GoatBot.config.whiteListModeThread.whiteListThreadIds.includes(event.threadID)
+					global.BruxaBot.config.whiteListModeThread?.enable == true
+					&& !global.BruxaBot.config.whiteListModeThread.whiteListThreadIds.includes(event.threadID)
 					// admin
-					&& !global.GoatBot.config.adminBot.includes(event.senderID)
+					&& !global.BruxaBot.config.adminBot.includes(event.senderID)
 				)
 					return;
 
@@ -1080,16 +1088,16 @@ async function startBot(loginWithEmail) {
 			}
 			// ———————————————————— START BOT ———————————————————— //
 			await stopListening();
-			global.GoatBot.Listening = api.listenMqtt(createCallBackListen());
-			global.GoatBot.callBackListen = callBackListen;
+			global.BruxaBot.Listening = api.listenMqtt(createCallBackListen());
+			global.BruxaBot.callBackListen = callBackListen;
 			// ——————————————————— UPTIME ——————————————————— //
-			if (global.GoatBot.config.serverUptime.enable == true && !global.GoatBot.config.dashBoard?.enable && !global.serverUptimeRunning) {
+			if (global.BruxaBot.config.serverUptime.enable == true && !global.BruxaBot.config.dashBoard?.enable && !global.serverUptimeRunning) {
 				const http = require('http');
 				const express = require('express');
 				const app = express();
 				const server = http.createServer(app);
 				const { data: html } = await axios.get("https://raw.githubusercontent.com/ntkhang03/resources-goat-bot/master/homepage/home.html");
-				const PORT = global.GoatBot.config.dashBoard?.port || (!isNaN(global.GoatBot.config.serverUptime.port) && global.GoatBot.config.serverUptime.port) || 3001;
+				const PORT = global.BruxaBot.config.dashBoard?.port || (!isNaN(global.BruxaBot.config.serverUptime.port) && global.BruxaBot.config.serverUptime.port) || 3001;
 				app.get('/', (req, res) => res.send(html));
 				app.get('/uptime', global.responseUptimeCurrent);
 				let nameUpTime;
@@ -1102,7 +1110,7 @@ async function startBot(loginWithEmail) {
 					nameUpTime.includes('localhost') && (nameUpTime = nameUpTime.replace('https', 'http'));
 					await server.listen(PORT);
 					log.info("UPTIME", getText('login', 'openServerUptimeSuccess', nameUpTime));
-					if (global.GoatBot.config.serverUptime.socket?.enable == true)
+					if (global.BruxaBot.config.serverUptime.socket?.enable == true)
 						require('./socketIO.js')(server);
 					global.serverUptimeRunning = true;
 				}
@@ -1128,7 +1136,7 @@ async function startBot(loginWithEmail) {
 					try {
 						await stopListening();
 						await sleep(1000);
-						global.GoatBot.Listening = api.listenMqtt(createCallBackListen());
+						global.BruxaBot.Listening = api.listenMqtt(createCallBackListen());
 						log.info("LISTEN_MQTT", getText('login', 'restartListenMessage2'));
 					}
 					catch (e) {
@@ -1141,7 +1149,7 @@ async function startBot(loginWithEmail) {
 		});
 	})(appState);
 
-	if (global.GoatBot.config.autoReloginWhenChangeAccount) {
+	if (global.BruxaBot.config.autoReloginWhenChangeAccount) {
 		setTimeout(function () {
 			watch(dirAccount, async (type) => {
 				if (type == 'change' && changeFbStateByCode == false && latestChangeContentAccount != fs.statSync(dirAccount).mtimeMs) {
@@ -1157,5 +1165,5 @@ async function startBot(loginWithEmail) {
 	}
 }
 
-global.GoatBot.reLoginBot = startBot;
+global.BruxaBot.reLoginBot = startBot;
 startBot();

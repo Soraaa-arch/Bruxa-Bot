@@ -2,9 +2,9 @@ const fs = require("fs-extra");
 const log = require("../logger/log.js");
 const path = require("path");
 
-let pathLanguageFile = `${__dirname}/${global.GoatBot.config.language}.lang`;
+let pathLanguageFile = `${__dirname}/${global.BruxaBot.config.language}.lang`;
 if (!fs.existsSync(pathLanguageFile)) {
-	log.warn("LANGUAGE", `Can't find language file ${global.GoatBot.config.language}.lang, using default language file "${__dirname}/en.lang"`);
+	log.warn("LANGUAGE", `Can't find language file ${global.BruxaBot.config.language}.lang, using default language file "${__dirname}/en.lang"`);
 	pathLanguageFile = `${__dirname}/en.lang`;
 }
 const readLanguage = fs.readFileSync(pathLanguageFile, "utf-8");

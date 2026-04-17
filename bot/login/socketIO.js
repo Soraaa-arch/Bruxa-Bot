@@ -5,7 +5,7 @@
  */
 const { Server } = require("socket.io");
 const { log, getText } = global.utils;
-const { config } = global.GoatBot;
+const { config } = global.BruxaBot;
 
 module.exports = async (server) => {
 	const { channelName, verifyToken } = config.serverUptime.socket;

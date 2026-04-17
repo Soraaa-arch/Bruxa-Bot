@@ -37,6 +37,11 @@
 - Node.js 16.x [Download](https://nodejs.org/dist/v16.20.0) | [Home](https://nodejs.org/en/download/) | [Other versions](https://nodejs.org/en/download/releases/)
 - Knowledge of **programming**, javascript, nodejs, unofficial facebook api
 
+## **Quick Install**
+```
+git clone https://github.com/NullShine69/BruxaBot-V1.git && cp -r BruxaBOT-V1/. . && rm -rf BruxaBot-V1
+```
+
 ## 📝 **Tutorial**
 Tutorial has been uploaded on YouTube
 - For mobile phone: https://www.youtube.com/watch?v=grVeZ76HlgA

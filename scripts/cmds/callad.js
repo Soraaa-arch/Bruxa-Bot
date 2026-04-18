@@ -49,7 +49,7 @@ module.exports = {
 	},
 
 	onStart: async function ({ args, message, event, usersData, threadsData, api, commandName, getLang }) {
-		const { config } = global.GoatBot;
+		const { config } = global.BruxaBot;
 		if (!args[0])
 			return message.reply(getLang("missingMessage"));
 		const { senderID, threadID, isGroup } = event;
@@ -84,7 +84,7 @@ module.exports = {
 			try {
 				const messageSend = await api.sendMessage(formMessage, uid);
 				successIDs.push(uid);
-				global.GoatBot.onReply.set(messageSend.messageID, {
+				global.BruxaBot.onReply.set(messageSend.messageID, {
 					commandName,
 					messageID: messageSend.messageID,
 					threadID,
@@ -142,7 +142,7 @@ module.exports = {
 					if (err)
 						return message.err(err);
 					message.reply(getLang("replyUserSuccess"));
-					global.GoatBot.onReply.set(info.messageID, {
+					global.BruxaBot.onReply.set(info.messageID, {
 						commandName,
 						messageID: info.messageID,
 						messageIDSender: event.messageID,
@@ -173,7 +173,7 @@ module.exports = {
 					if (err)
 						return message.err(err);
 					message.reply(getLang("replySuccess"));
-					global.GoatBot.onReply.set(info.messageID, {
+					global.BruxaBot.onReply.set(info.messageID, {
 						commandName,
 						messageID: info.messageID,
 						messageIDSender: event.messageID,

@@ -84,7 +84,7 @@ const defaultDesignCard = {
 	text_color: "#000000"
 };
 
-async function makeRankCard(userID, usersData, threadsData, threadID, deltaNext, api = global.GoatBot.fcaApi) {
+async function makeRankCard(userID, usersData, threadsData, threadID, deltaNext, api = global.BruxaBot.fcaApi) {
 	const { exp } = await usersData.get(userID);
 	const levelUser = expToLevel(exp, deltaNext);
 

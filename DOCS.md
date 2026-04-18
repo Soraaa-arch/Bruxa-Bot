@@ -22,7 +22,7 @@ See [utils.js](https://github.com/ntkhang03/Goat-Bot-V2/blob/main/utils.js) for 
 - Knowledge of [Facebook Chat API Unofficial](https://github.com/ntkhang03/fb-chat-api/blob/master/DOCS.md)
 
 ### **⚠️ Important Note**
-- Any issues related to 18+, vulgarity, obscenity, pornography, treason, politics, etc., are not allowed in GoatBot. Adding custom commands or modifying the code to violate these rules will result in a **permanent ban**. Please be cautious with each line of your code.
+- Any issues related to 18+, vulgarity, obscenity, pornography, treason, politics, etc., are not allowed in BruxaBot. Adding custom commands or modifying the code to violate these rules will result in a **permanent ban**. Please be cautious with each line of your code.
 <hr>
 
 ### **💾 Database**
@@ -176,7 +176,7 @@ await threadsData.refreshInfo(threadID, threadInfo);
 * Reference from available commands: [cmds](https://github.com/ntkhang03/Goat-Bot-V2/tree/main/scripts/cmds) and [events](https://github.com/ntkhang03/Goat-Bot-V2/tree/main/scripts/events)
 * See example at for command [here](https://github.com/ntkhang03/Goat-Bot-V2/blob/main/scripts/cmds/newcommand.eg.js), for event [here](https://github.com/ntkhang03/Goat-Bot-V2/blob/main/scripts/events/newcommandevent.eg.js)
 * Or if using vscode you can create new command with snippets 
-  `GoatBotCommandCreate` or `GoatBotEventCreate` (press <kbd>tab</kbd> to jump to next placeholder)
+  `BruxaBotCommandCreate` or `BruxaBotEventCreate` (press <kbd>tab</kbd> to jump to next placeholder)
 
 	<img src="https://i.ibb.co/VTstrSy/Animation.gif" width="400px" />
 

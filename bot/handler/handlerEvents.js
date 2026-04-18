@@ -70,7 +70,7 @@ function getRoleConfig(utils, command, isGroup, threadData, commandName) {
 }
 
 function isBannedOrOnlyAdmin(userData, threadData, senderID, threadID, isGroup, commandName, message, lang) {
-	const config = global.GoatBot.config;
+	const config = global.BruxaBot.config;
 	const { adminBot, hideNotiMessage } = config;
 
 	// check if user banned
@@ -446,7 +446,7 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
 				const { commandName, threadIDsChattedFirstTime } = itemOnFirstChat;
 				if (threadIDsChattedFirstTime.includes(threadID))
 					continue;
-				const command = GoatBot.commands.get(commandName);
+				const command = BruxaBot.commands.get(commandName);
 				if (!command)
 					continue;
 
@@ -508,7 +508,7 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
 				message.reply(utils.getText({ lang: langCode, head: "handlerEvents" }, "cannotFindCommandName"));
 				return log.err("onReply", `Can't find command name to execute this reply!`, Reply);
 			}
-			const command = GoatBot.commands.get(commandName);
+			const command = BruxaBot.commands.get(commandName);
 			if (!command) {
 				message.reply(utils.getText({ lang: langCode, head: "handlerEvents" }, "cannotFindCommand", commandName));
 				return log.err("onReply", `Command "${commandName}" not found`, Reply);
@@ -570,7 +570,7 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
 				message.reply(utils.getText({ lang: langCode, head: "handlerEvents" }, "cannotFindCommandName"));
 				return log.err("onReaction", `Can't find command name to execute this reaction!`, Reaction);
 			}
-			const command = GoatBot.commands.get(commandName);
+			const command = BruxaBot.commands.get(commandName);
 			if (!command) {
 				message.reply(utils.getText({ lang: langCode, head: "handlerEvents" }, "cannotFindCommand", commandName));
 				return log.err("onReaction", `Command "${commandName}" not found`, Reaction);
@@ -624,9 +624,9 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
 		*/
 		async function handlerEvent() {
 			const { author } = event;
-			const allEventCommand = GoatBot.eventCommands.entries();
+			const allEventCommand = BruxaBot.eventCommands.entries();
 			for (const [key] of allEventCommand) {
-				const getEvent = GoatBot.eventCommands.get(key);
+				const getEvent = BruxaBot.eventCommands.get(key);
 				if (!getEvent)
 					continue;
 				const commandName = getEvent.config.name;

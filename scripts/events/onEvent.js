@@ -1,11 +1,11 @@
-const allOnEvent = global.GoatBot.onEvent;
+const allOnEvent = global.BruxaBot.onEvent;
 
 module.exports = {
 	config: {
 		name: "onEvent",
 		version: "1.1",
 		author: "NTKhang",
-		description: "Loop to all event in global.GoatBot.onEvent and run when have new event",
+		description: "Loop to all event in global.BruxaBot.onEvent and run when have new event",
 		category: "events"
 	},
 

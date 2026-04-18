@@ -199,7 +199,7 @@ module.exports = {
 		message.reply({
 			attachment: gameData.imageStream
 		}, (err, info) => {
-			global.GoatBot.onReply.set(info.messageID, {
+			global.BruxaBot.onReply.set(info.messageID, {
 				commandName,
 				messageID: info.messageID,
 				author: event.senderID,
@@ -216,7 +216,7 @@ module.exports = {
 		const numbers = (event.body || "").split("").map(item => item.trim()).filter(item => item != "" && !isNaN(item));
 		if (numbers.length != oldGameData.col)
 			return message.reply(getLang("invalidNumbers", oldGameData.col));
-		global.GoatBot.onReply.delete(Reply.messageID);
+		global.BruxaBot.onReply.delete(Reply.messageID);
 
 		oldGameData.numbers = numbers;
 		const gameData = guessNumberGame(oldGameData);
@@ -226,7 +226,7 @@ module.exports = {
 				attachment: gameData.imageStream
 			}, (err, info) => {
 				message.unsend(Reply.messageID);
-				global.GoatBot.onReply.set(info.messageID, {
+				global.BruxaBot.onReply.set(info.messageID, {
 					commandName,
 					messageID: info.messageID,
 					author: event.senderID,

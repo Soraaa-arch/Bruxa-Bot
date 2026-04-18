@@ -49,7 +49,7 @@ module.exports = {
 				await getStreamFromURL(image2)
 			]
 		}, (err, info) => {
-			global.GoatBot.onReply.set(info.messageID, {
+			global.BruxaBot.onReply.set(info.messageID, {
 				commandName,
 				messageID: info.messageID,
 				author: event.senderID,
@@ -64,7 +64,7 @@ module.exports = {
 			return message.reply(getLang("notPlayer"));
 
 		if (formatText(event.body) == formatText(wordcomplete)) {
-			global.GoatBot.onReply.delete(messageID);
+			global.BruxaBot.onReply.delete(messageID);
 			await usersData.addMoney(event.senderID, envCommands[commandName].reward);
 			message.reply(getLang("correct", envCommands[commandName].reward));
 		}

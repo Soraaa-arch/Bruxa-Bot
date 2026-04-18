@@ -119,7 +119,7 @@ module.exports = {
 						return message.reply(getLang('shortcutExists', key), async (err, info) => {
 							if (err)
 								return;
-							global.GoatBot.onReaction.set(info.messageID, {
+							global.BruxaBot.onReaction.set(info.messageID, {
 								commandName,
 								messageID: info.messageID,
 								author: senderID,
@@ -219,7 +219,7 @@ module.exports = {
 				message.reply(getLang('confirmRemoveAll'), (err, info) => {
 					if (err)
 						return;
-					global.GoatBot.onReaction.set(info.messageID, {
+					global.BruxaBot.onReaction.set(info.messageID, {
 						commandName,
 						messageID: info.messageID,
 						author: senderID,

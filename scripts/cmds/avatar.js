@@ -80,7 +80,7 @@ module.exports = {
 			id: idNhanVat,
 			chu_Nen,
 			chu_Ky,
-			apikey: "ntkhangGoatBot"
+			apikey: "ntkhangBruxaBot"
 		};
 		if (colorBg)
 			params.colorBg = colorBg;

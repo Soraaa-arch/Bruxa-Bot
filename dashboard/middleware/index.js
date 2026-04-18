@@ -117,7 +117,7 @@ module.exports = function (checkAuthConfigDashboardOfThread) {
 
 		async isAdmin(req, res, next) {
 			const userID = req.user.facebookUserID;
-			if (!global.GoatBot.config.adminBot.includes(userID)) {
+			if (!global.BruxaBot.config.adminBot.includes(userID)) {
 				if (isPostMethod(req))
 					return res.status(401).send({
 						status: "error",

@@ -26,8 +26,8 @@ module.exports = {
 	},
 
 	onStart: async function ({ message, getLang }) {
-		global.GoatBot.config = fs.readJsonSync(global.client.dirConfig);
-		global.GoatBot.configCommands = fs.readJsonSync(global.client.dirConfigCommands);
+		global.BruxaBot.config = fs.readJsonSync(global.client.dirConfig);
+		global.BruxaBot.configCommands = fs.readJsonSync(global.client.dirConfigCommands);
 		message.reply(getLang("success"));
 	}
 };

@@ -1,4 +1,4 @@
-const { config } = global.GoatBot;
+const { config } = global.BruxaBot;
 
 module.exports = (code, text) => `<body class="main full-padding" style="margin: 0;padding: 0;-webkit-text-size-adjust: 100%;">
 <table class="wrapper"

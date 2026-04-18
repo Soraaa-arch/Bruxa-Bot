@@ -37,7 +37,7 @@ module.exports = {
 			if (author == api.getCurrentUserID())
 				return;
 			let threadName;
-			const { config } = global.GoatBot;
+			const { config } = global.BruxaBot;
 
 			if (event.logMessageType == "log:subscribe") {
 				if (!event.logMessageData.addedParticipants.some(item => item.userFbId == api.getCurrentUserID()))

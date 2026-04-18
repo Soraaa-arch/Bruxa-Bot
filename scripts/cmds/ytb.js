@@ -136,7 +136,7 @@ module.exports = {
 			body: getLang("choose", msg),
 			attachment: await Promise.all(thumbnails)
 		}, (err, info) => {
-			global.GoatBot.onReply.set(info.messageID, {
+			global.BruxaBot.onReply.set(info.messageID, {
 				commandName,
 				messageID: info.messageID,
 				author: event.senderID,

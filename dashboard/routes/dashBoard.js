@@ -60,7 +60,7 @@ module.exports = function ({ isAuthenticated, isVeryfiUserIDFacebook, checkHasAn
 								urlDownload: value.data.webContentLink
 							};
 						});
-					variables.defaultWelcomeMessage = global.GoatBot.configCommands.envEvents.welcome.defaultWelcomeMessage;
+					variables.defaultWelcomeMessage = global.BruxaBot.configCommands.envEvents.welcome.defaultWelcomeMessage;
 					variables.welcomeAttachments = pending;
 					break;
 				}
@@ -81,7 +81,7 @@ module.exports = function ({ isAuthenticated, isVeryfiUserIDFacebook, checkHasAn
 								urlDownload: value.data.webContentLink
 							};
 						});
-					variables.defaultLeaveMessage = global.GoatBot.configCommands.envEvents.leave.defaultLeaveMessage;
+					variables.defaultLeaveMessage = global.BruxaBot.configCommands.envEvents.leave.defaultLeaveMessage;
 					variables.leaveAttachments = pending;
 					break;
 				}

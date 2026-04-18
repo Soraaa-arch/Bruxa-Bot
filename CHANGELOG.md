@@ -60,7 +60,7 @@
 ---
 ## 📦 Version 1.5.29
 ### ⬆️ What's Changed
-- **.vscode/GoatBot.code-snippets**: remove `shortDescription` and `longDescription`, replace with `description` in scripts
+- **.vscode/BruxaBot.code-snippets**: remove `shortDescription` and `longDescription`, replace with `description` in scripts
 - **.vscode/settings.json**: remove `shortDescription` and `longDescription`, replace with `description` in scripts
 - **Goat.js**: code optimization
 - **bot/login/login.js**: code optimization
@@ -527,7 +527,7 @@ Fixed Sorry, we can't download the video for you because the size is larger than
 ## 📦 Version 1.5.1
 ### ⬆️ What's Changed
 - **.gitignore**: Update .gitignore
-- **.vscode/GoatBot.code-snippets**: add new snippet: `LogDev`: "Create template for log dev"
+- **.vscode/BruxaBot.code-snippets**: add new snippet: `LogDev`: "Create template for log dev"
 - **dashboard/routes/verifyfbid.js**: fix can't verify uid facebook
 - **fb-chat-api/src/addUserToGroup.js**: Update addUserToGroup.js
 - **fb-chat-api/src/listenMqtt.js**: Update listenMqtt.js
@@ -621,7 +621,7 @@ Fixed Sorry, we can't download the video for you because the size is larger than
 - **restoreBackup.js**: Update restoreBackup.js
 - **scripts/cmds/texttoimage.js**: fix cannot use command `texttoimage`
 - **updater.js**: Update updater.js
-- **utils.js**: add new class `GoatBotApis`: call api on https://goatbot.tk
+- **utils.js**: add new class `BruxaBotApis`: call api on https://goatbot.tk
 ### Contributors
 - <div style="display: flex; align-items: center;"><a href="https://github.com/ntkhang03">ntkhang03&nbsp;&nbsp;</a> <img src="https://github.com/ntkhang03.png" width="20" height="20" style="border-radius:50%; margin-top: px;" alt="ntkhang03"></div>
 
@@ -936,7 +936,7 @@ Dependencies will be reinstalled for this version.
 ## 📦 Version 1.3.19
 ### ⬆️ What's Changed
 - **.gitignore**: Update .gitignore
-- **.vscode/GoatBot.code-snippets**: add new snippets: `GoatBotCommandSetOnReply`, `GoatBotCommandSetOnReaction`, `GoatBotCommandPushOnEvent`, `GoatBotCommandSetOnChat`
+- **.vscode/BruxaBot.code-snippets**: add new snippets: `BruxaBotCommandSetOnReply`, `BruxaBotCommandSetOnReaction`, `BruxaBotCommandPushOnEvent`, `BruxaBotCommandSetOnChat`
 - **Goat.js**: add new handle: `onFirstChat`
 - **bot/handler/handlerAction.js**: add new handle: `onFirstChat`
 - **bot/handler/handlerCheckData.js**: code optimization
@@ -1694,7 +1694,7 @@ Dependencies will be reinstalled for this version.
 - **DOCS.md**: update docs
 - **bot/handler/handlerEvents.js**: update
 - **bot/login/loadScripts.js**: update
-- **.vscode/GoatBot.code-snippets**: new snippets: GoatBotEventCreate
+- **.vscode/BruxaBot.code-snippets**: new snippets: BruxaBotEventCreate
 ### Contributors
 - <div style="display: flex; align-items: center;"><a href="https://github.com/ntkhang03">ntkhang03&nbsp;&nbsp;</a> <img src="https://github.com/ntkhang03.png" width="20" height="20" style="border-radius:50%; margin-top: px;" alt="ntkhang03"></div>
 
@@ -1754,7 +1754,7 @@ Dependencies will be reinstalled for this version.
 ---
 ## 📦 Version 1.2.9
 ### ⬆️ What's Changed
-- **.vscode/GoatBot.code-snippets**: add code snippets
+- **.vscode/BruxaBot.code-snippets**: add code snippets
 - **bot/login/login.js**: languages update
 - **languages/cmds/en.js**: languages update
 - **scripts/cmds/adduser.js**: language update

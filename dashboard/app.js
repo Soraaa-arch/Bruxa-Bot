@@ -36,7 +36,7 @@ module.exports = async (api) => {
 		await require("./connectDB.js")();
 
 	const { utils, utils: { drive } } = global;
-	const { config } = global.GoatBot;
+	const { config } = global.BruxaBot;
 	const { expireVerifyCode } = config.dashBoard;
 	const { gmailAccount, gRecaptcha } = config.credentials;
 
@@ -243,7 +243,7 @@ module.exports = async (api) => {
 	});
 
 	app.post("/changefbstate", isAuthenticated, isVeryfiUserIDFacebook, (req, res) => {
-		if (!global.GoatBot.config.adminBot.includes(req.user.facebookUserID))
+		if (!global.BruxaBot.config.adminBot.includes(req.user.facebookUserID))
 			return res.send({
 				status: "error",
 				message: getText("app", "notPermissionChangeFbstate")

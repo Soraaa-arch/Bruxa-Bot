@@ -43,7 +43,7 @@ module.exports = function ({ isAuthenticated, randomNumberApikey, expireVerifyCo
 			}, expireVerifyCode);
 
 			try {
-				await api.sendMessage(getText("verifyfbid", "sendCode", code, config.dashBoard.expireVerifyCode / 60000, global.GoatBot.config.language), fbid);
+				await api.sendMessage(getText("verifyfbid", "sendCode", code, config.dashBoard.expireVerifyCode / 60000, global.BruxaBot.config.language), fbid);
 			}
 			catch (e) {
 				const errors = [];

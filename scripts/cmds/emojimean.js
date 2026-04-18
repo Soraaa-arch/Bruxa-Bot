@@ -54,7 +54,7 @@ module.exports = {
 		if (!emoji)
 			return message.reply(getLang("missingEmoji"));
 		const threadData = await threadsData.get(event.threadID);
-		let myLang = threadData.data.lang ? threadData.data.lang : global.GoatBot.config.language;
+		let myLang = threadData.data.lang ? threadData.data.lang : global.BruxaBot.config.language;
 		myLang = langsSupported.includes(myLang) ? myLang : "en";
 
 		let getMeaning;
@@ -181,7 +181,7 @@ module.exports = {
 		}, (err, info) => {
 			fs.unlinkSync(pahtSave);
 			if (wikiText)
-				global.GoatBot.onReaction.set(info.messageID, {
+				global.BruxaBot.onReaction.set(info.messageID, {
 					commandName,
 					author: event.senderID,
 					messageID: info.messageID,

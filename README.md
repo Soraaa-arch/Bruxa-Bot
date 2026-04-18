@@ -73,10 +73,10 @@ Summary instructions:
     - the way it works is like `onChat`.
 
   - `onReaction`:
-    - the handler will run when the user `reacts` to a `message has messageID` is set in `GoatBot.onReaction` as follows:
+    - the handler will run when the user `reacts` to a `message has messageID` is set in `BruxaBot.onReaction` as follows:
 		```javascript
 		// example:	
-		global.GoatBot.onReaction.set(msg.messageID, {
+		global.BruxaBot.onReaction.set(msg.messageID, {
 			messageID: msg.messageID,
 			commandName,
 			// ... and more
@@ -86,10 +86,10 @@ Summary instructions:
     - next, it will check `permission` of the user and `execute` if the user has permission and `log` information to the console.
 
   - `onReply`:
-    - the handler will run when the user `replies` to a `message has messageID` is set in `GoatBot.onReply` as follows:
+    - the handler will run when the user `replies` to a `message has messageID` is set in `BruxaBot.onReply` as follows:
 		```javascript
 		// example:
-		global.GoatBot.onReply.set(msg.messageID, {
+		global.BruxaBot.onReply.set(msg.messageID, {
 			messageID: msg.messageID,
 			commandName,
 			// ... and more
@@ -102,7 +102,7 @@ Summary instructions:
     - the handler will run `when the user has a new event` type `event` (new user join, user leave chat box, change admin box,...)
 		```javascript
 		// example:
-		global.GoatBot.onEvent.set(msg.messageID, {
+		global.BruxaBot.onEvent.set(msg.messageID, {
 			messageID: msg.messageID,
 			commandName,
 			// ... and more
@@ -113,7 +113,7 @@ Summary instructions:
 
   - `handlerEvent`:
     - the handler will run `when the user has a new event` type `event` (new user join, user leave chat box, change admin box,...)
-    - it will get all the eventCommand set in `GoatBot.eventCommands` (scripts placed in the `scripts/events` folder)
+    - it will get all the eventCommand set in `BruxaBot.eventCommands` (scripts placed in the `scripts/events` folder)
     - it will loop through all `eventCommands` and run the `onStart` in that command.
     - if it return a `function` or `async function` then it will call the function and `log` information to the console.
 

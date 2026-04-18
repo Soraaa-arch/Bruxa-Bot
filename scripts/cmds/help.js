@@ -2,7 +2,7 @@ const fs = require("fs-extra");
 const axios = require("axios");
 const path = require("path");
 const { getPrefix } = global.utils;
-const { commands, aliases } = global.GoatBot;
+const { commands, aliases } = global.BruxaBot;
 const doNotDelete = "[ 🐐 | Goat Bot V2 ]";
 /**
 * @author NTKhang
@@ -163,7 +163,7 @@ module.exports = {
 	},
 
 	onStart: async function ({ message, args, event, threadsData, getLang, role, globalData }) {
-		const langCode = await threadsData.get(event.threadID, "data.lang") || global.GoatBot.config.language;
+		const langCode = await threadsData.get(event.threadID, "data.lang") || global.BruxaBot.config.language;
 		let customLang = {};
 		const pathCustomLang = path.normalize(`${process.cwd()}/languages/cmds/${langCode}.js`);
 		if (fs.existsSync(pathCustomLang))

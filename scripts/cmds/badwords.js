@@ -197,7 +197,7 @@ module.exports = {
 		const isEnabled = threadData.settings.badWords;
 		if (!isEnabled)
 			return;
-		const allAliases = [...(global.GoatBot.commands.get("badwords").config.aliases || []), ...(threadData.data.aliases?.["badwords"] || [])];
+		const allAliases = [...(global.BruxaBot.commands.get("badwords").config.aliases || []), ...(threadData.data.aliases?.["badwords"] || [])];
 		const isCommand = allAliases.some(a => event.body.startsWith(prefix + a));
 		if (isCommand)
 			return;
@@ -219,7 +219,7 @@ module.exports = {
 					api.removeUserFromGroup(event.senderID, event.threadID, (err) => {
 						if (err)
 							return message.reply(getLang("needAdmin"), (e, info) => {
-								let { onEvent } = global.GoatBot;
+								let { onEvent } = global.BruxaBot;
 								onEvent.push({
 									messageID: info.messageID,
 									onStart: ({ event }) => {

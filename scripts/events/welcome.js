@@ -38,7 +38,7 @@ module.exports = {
 			return async function () {
 				const hours = getTime("HH");
 				const { threadID } = event;
-				const { nickNameBot } = global.GoatBot.config;
+				const { nickNameBot } = global.BruxaBot.config;
 				const prefix = global.utils.getPrefix(threadID);
 				const dataAddedParticipants = event.logMessageData.addedParticipants;
 				// if new member is bot

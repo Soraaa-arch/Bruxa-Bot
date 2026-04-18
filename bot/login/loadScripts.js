@@ -8,7 +8,7 @@ const exec = (cmd, options) => new Promise((resolve, reject) => {
 	});
 });
 const { log, loading, getText, colors, removeHomeDir } = global.utils;
-const { GoatBot } = global;
+const { BruxaBot } = global;
 const { configCommands } = BruxaBot;
 const regExpCheckPackage = /require(\s+|)\((\s+|)[`'"]([^`'"]+)[`'"](\s+|)\)/g;
 const packageAlready = [];

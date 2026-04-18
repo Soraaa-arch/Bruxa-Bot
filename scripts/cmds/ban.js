@@ -150,7 +150,7 @@ module.exports = {
 			return message.reply(getLang('existedBan'));
 
 		const name = members[target]?.name || (await usersData.getName(target)) || getLang('noName');
-		const time = moment().tz(global.GoatBot.config.timeZone).format('HH:mm:ss DD/MM/YYYY');
+		const time = moment().tz(global.BruxaBot.config.timeZone).format('HH:mm:ss DD/MM/YYYY');
 		const data = {
 			id: target,
 			time,
@@ -167,13 +167,13 @@ module.exports = {
 				}
 				else {
 					message.send(getLang('needAdmin'), (err, info) => {
-						global.GoatBot.onEvent.push({
+						global.BruxaBot.onEvent.push({
 							messageID: info.messageID,
 							onStart: ({ event }) => {
 								if (event.logMessageType === "log:thread-admins" && event.logMessageData.ADMIN_EVENT == "add_admin") {
 									const { TARGET_ID } = event.logMessageData;
 									if (TARGET_ID == api.getCurrentUserID()) {
-										api.removeUserFromGroup(target, event.threadID, () => global.GoatBot.onEvent = global.GoatBot.onEvent.filter(item => item.messageID != info.messageID));
+										api.removeUserFromGroup(target, event.threadID, () => global.BruxaBot.onEvent = global.BruxaBot.onEvent.filter(item => item.messageID != info.messageID));
 									}
 								}
 							}
@@ -199,13 +199,13 @@ module.exports = {
 					return api.removeUserFromGroup(userFbId, threadID, err => {
 						if (err)
 							return message.send(getLang('needAdminToKick', fullName, userFbId), (err, info) => {
-								global.GoatBot.onEvent.push({
+								global.BruxaBot.onEvent.push({
 									messageID: info.messageID,
 									onStart: ({ event }) => {
 										if (event.logMessageType === "log:thread-admins" && event.logMessageData.ADMIN_EVENT == "add_admin") {
 											const { TARGET_ID } = event.logMessageData;
 											if (TARGET_ID == api.getCurrentUserID()) {
-												api.removeUserFromGroup(userFbId, event.threadID, () => global.GoatBot.onEvent = global.GoatBot.onEvent.filter(item => item.messageID != info.messageID));
+												api.removeUserFromGroup(userFbId, event.threadID, () => global.BruxaBot.onEvent = global.BruxaBot.onEvent.filter(item => item.messageID != info.messageID));
 											}
 										}
 									}

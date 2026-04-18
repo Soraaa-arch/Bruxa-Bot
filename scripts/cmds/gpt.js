@@ -175,7 +175,7 @@ async function handleGpt(event, message, args, getLang, commandName) {
 		});
 
 		return message.reply(text, (err, info) => {
-			global.GoatBot.onReply.set(info.messageID, {
+			global.BruxaBot.onReply.set(info.messageID, {
 				commandName,
 				author: event.senderID,
 				messageID: info.messageID

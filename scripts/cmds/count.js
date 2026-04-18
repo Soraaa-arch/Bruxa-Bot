@@ -88,7 +88,7 @@ module.exports = {
 					return message.reply(msg, (err, info) => {
 						if (err)
 							return message.err(err);
-						global.GoatBot.onReply.set(info.messageID, {
+						global.BruxaBot.onReply.set(info.messageID, {
 							commandName,
 							messageID: info.messageID,
 							splitPage,
@@ -135,7 +135,7 @@ module.exports = {
 			if (err)
 				return message.err(err);
 			message.unsend(Reply.messageID);
-			global.GoatBot.onReply.set(info.messageID, {
+			global.BruxaBot.onReply.set(info.messageID, {
 				commandName,
 				messageID: info.messageID,
 				splitPage,

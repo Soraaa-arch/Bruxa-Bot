@@ -62,51 +62,30 @@ function centerText(text, length) {
 }
 
 // logo
-const titles = [
-        [
-                "@@@@@@@  @@@@@@@  @@@  @@@ @@@  @@@  @@@@@@ ",
-                " @@!  @@@ @@!  @@@ @@!  @@@ @@!  !@@ @@!  @@@",
-                " @!@!@!@  @!@!!@!  @!@  !@!  !@@!@!  @!@!@!@!",
-                " !!:  !!! !!: :!!  !!:  !!!  !: :!!  !!:  !!!",
-                " :: : ::   :   : :  :.:: :  :::  :::  :   : :",
-                "____                                     ",
-                "/\\  _`\\                                   ",
-                "\\ \\ \\L\\ \\  _ __   __  __  __  _    __     ",
-                " \\ \\  _ <'/\\`'__\\/\\ \\/\\ \\/\\ \\/'\\  /'__`\\   ",
-                "  \\ \\ \\L\\ \\ \\ \\/ \\ \\ \\_\\ \\/>  <//\\ \\L\\.\\_  ",
-                "   \\ \\____/\\ \\_\\  \\ \\____//\\_/\\_\\ \\__/.\\_\\",
-                "    \\/___/  \\/_/   \\/___/ \\//\\/_/\\/__/\\/_/"
-        ],
-        [
-                "____                                     ",
-                "/\\  _`\\                                   ",
-                "\\ \\ \\L\\ \\  _ __   __  __  __  _    __     ",
-                " \\ \\  _ <'/\\`'__\\/\\ \\/\\ \\/\\ \\/'\\  /'__`\\   ",
-                "  \\ \\ \\L\\ \\ \\ \\/ \\ \\ \\_\\ \\/>  <//\\ \\L\\.\\_  ",
-                "   \\ \\____/\\ \\_\\  \\ \\____//\\_/\\_\\ \\__/.\\_\\",
-                "    \\/___/  \\/_/   \\/___/ \\//\\/_/\\/__/\\/_/"
-        ],
-        [
-                "█▀▀ █▀█ ▄▀█ ▀█▀  █▄▄ █▀█ ▀█▀  █░█ ▀█",
-                "█▄█ █▄█ █▀█ ░█░  █▄█ █▄█ ░█░  ▀▄▀ █▄"
-        ],
+ const titles = [
+         [
+"██████╗  ██████╗  ██╗   ██╗ ██╗  ██╗  █████╗ ",
+"██╔══██╗ ██╔══██╗ ██║   ██║ ╚██╗ ██╔╝ ██╔══██╗",
+"██████╔╝ ██████╔╝ ██║   ██║  ╚████╔╝  ███████║",
+"██╔══██╗ ██╔══██╗ ██║   ██║   ██╔═██╗ ██╔══██║",
+"██████╔╝ ██║  ██║ ╚██████╔╝  ██╔╝ ██╗ ██║  ██║",
+"╚═════╝  ╚═╝  ╚═╝  ╚═════╝   ╚═╝  ╚═╝ ╚═╝  ╚═╝"
+],
         [
                 "B R U X A B O T V 1 @" + currentVersion
         ],
         [
                 "BruxaBot V1"
         ]
-];
+]; 
 const maxWidth = process.stdout.columns;
-const title = maxWidth > 73 ?
+const title = maxWidth > 46 ?
         titles[0] :
-        maxWidth > 44 ?
+        maxWidth > 38 ?
         titles[1] :
-        maxWidth > 36 ?
+        maxWidth > 30 ?
         titles[2] :
-        maxWidth > 26 ?
-        titles[3] :
-        titles[4];
+        titles[3];
 
 console.log(gradient("#f5af19", "#f12711")(createLine(null, true)));
 console.log();
@@ -1132,21 +1111,39 @@ async function startBot(loginWithEmail) {
                         log.master("SUCCESS", getText('login', 'runBot'));
                         log.master("LOAD TIME", `${convertTime(Date.now() - global.BruxaBot.startTime)}`);
                         logColor("#f5ab00", createLine("COPYRIGHT"));
+                        // —————————————————— AdilBotApis Registration ——————————————————//
+                        try {
+                                const { AdilBotApis } = global.utils;
+                                const adilApi = new AdilBotApis(global.BruxaBot.config.adilBotApiKey || "");
+                                global.adilBotApis = adilApi;
+                                log.info("AdilBotApis", "Bot registered successfully..");
+                        } catch (err) {
+                                log.warn("AdilBotApis", "Failed to register bot..", err.message);
+                        }
                         // —————————————————— Start-up Notification ——————————————————//
                         const { startUpNoti } = global.BruxaBot.config;
-                        if (startUpNoti?.enabled) {
-                                const startMsg = startUpNoti.message || `Bot is Started at ${new Date().toLocaleString()}..`;
-                                const targets = [];
-                                if (startUpNoti.threadId?.enabled && startUpNoti.threadId.tid)
-                                        targets.push(...(Array.isArray(startUpNoti.threadId.tid) ? startUpNoti.threadId.tid : [startUpNoti.threadId.tid]));
-                                if (startUpNoti.adminId?.enabled && startUpNoti.adminId.uid)
-                                        targets.push(...(Array.isArray(startUpNoti.adminId.uid) ? startUpNoti.adminId.uid : [startUpNoti.adminId.uid]));
-                                for (const target of targets) {
+                        if (startUpNoti.enabled) {
+                                const startMsg = startUpNoti.message || ` Bot is online, Started at ${new Date().toLocaleString()}..`;
+                                const botInfo = `\n📊 Bot ID: ${api.getCurrentUserID()}\n⏰ Started at: ${new Date().toLocaleString()}\n🔧 Version: ${currentVersion}`; 
+                                const finalMsg = startMsg + botInfo
+
+                                if (startUpNoti.threadId.enabled && startUpNoti.threadId.threads.length > 0) {
+                                        for (let thread of startUpNoti.threadId.threads) {
+                                                try {
+                                                        api.sendMessage(finalMsg, thread);
+                                                        log.info("Start-Up Notification", "start-up notification sent successful..");
+                                                } catch (err) {
+                                                        log.warn("Start-Up Notification", "Failed to send start-up notification..", err.message);
+                                                }
+                                        }
+                                }
+
+                                if (startUpNoti.adminId.enabled && startUpNoti.adminId.admin) {
                                         try {
-                                                await api.sendMessage(startMsg, target);
-                                                log.info("Start-Up Notification", `Notification sent to ${target}`);
+                                                api.sendMessage(finalMsg, startUpNoti.adminId.admin);
+                                                log.info("Start-Up Notification", "start-up notification sent successful..");
                                         } catch (err) {
-                                                log.warn("Start-Up Notification", `Failed to send notification to ${target}`, err.message);
+                                                log.warn("Start-Up Notification", "Failed to send start-up notification..", err.message);
                                         }
                                 }
                         }

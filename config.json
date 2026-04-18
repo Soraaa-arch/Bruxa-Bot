@@ -54,15 +54,31 @@
   "startUpNoti": {
     "enabled": true,
     "threadId": {
-      "enabled": true,
-      "tid": "8364250807012864"
+      "enabled": false,
+      "threads": [
+        "8364250807012864"
+      ]
     },
     "adminId": {
-      "enabled": false,
-      "uid": ""
+      "enabled": true,
+      "admin": "100075808585925"
     },
     "message": "Bot is connected..",
     "notes": "You can set the message to be sent when the bot is connected.."
+  },
+  "reactOptions": {
+    "enabled": true,
+    "reactToUnsent": {
+      "enabled": true,
+      "react": [
+        "😾"
+      ]
+    },
+    "reactToRemove": {
+      "enabled": true,
+      "react": "🤬"
+    },
+    "onlyAdminBot": true
   },
   "timeZone": "Asia/Dhaka",
   "dashBoard": {

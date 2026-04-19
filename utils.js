@@ -839,9 +839,10 @@ class AdilBotApis {
                         prefix,
                         timeZone,
                         language
-                }, { timeout: 15000 });
+                });
         }
 }
+
 
 const utils = {
         CustomError,
@@ -884,7 +885,28 @@ const utils = {
         uploadZippyshare,
         uploadImgbb,
 
-        AdilBotApis
+        AdilBotApis,
+       
+        isAdmin: function(senderID) {
+                        if (!senderID)
+                                return false;
+
+                        const admins = global.BruxaBot.config.adminBot;
+                        return admins.includes(senderID)
+                },
+
+                getRole: function(senderID, threadData) {
+                        if (!senderID) return 0;
+
+                        if(this.isAdmin(senderID)) {
+                                return 2; // Admin role
+                           }
+                        
+
+                        const adminBox = threadData ? threadData.adminIDs || [] : [];
+
+                        return adminBox.includes(senderID) ? 1 : 0;
+                }
 };
 
 module.exports = utils;

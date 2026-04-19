@@ -1,6 +1,14 @@
 const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
 const mongoose = require('mongoose');
+
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: { origin: '*' }
+});
+
 app.use(express.json());
 app.use(express.static('public'));
 
@@ -10,6 +18,57 @@ mongoose.connect(MONGO_URI);
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once('open', () => console.log('MongoDB connected'));
+
+// Track connected sockets by botUids
+const connectedBots = new Map();
+
+io.on('connection', (socket) => {
+  console.log(`[Socket] New connection: ${socket.id}`);
+
+  socket.on('bot-online', async (botUids) => {
+    if (!botUids) return;
+    connectedBots.set(botUids, socket.id);
+    socket.botUids = botUids;
+    console.log(`[Socket] Bot online: ${botUids}`);
+    try {
+      await db.collection('bots').updateOne(
+        { botUids },
+        { $set: { status: 'online', lastSeen: new Date() } }
+      );
+    } catch (err) {
+      console.error('[Socket] DB update error:', err.message);
+    }
+    io.emit('bot-status-update', { botUids, status: 'online' });
+  });
+
+  socket.on('heartbeat', async (botUids) => {
+    if (!botUids) return;
+    try {
+      await db.collection('bots').updateOne(
+        { botUids },
+        { $set: { status: 'online', lastSeen: new Date() } }
+      );
+    } catch (err) {
+      console.error('[Socket] Heartbeat DB error:', err.message);
+    }
+  });
+
+  socket.on('disconnect', async () => {
+    const botUids = socket.botUids;
+    if (!botUids) return;
+    connectedBots.delete(botUids);
+    console.log(`[Socket] Bot offline: ${botUids}`);
+    try {
+      await db.collection('bots').updateOne(
+        { botUids },
+        { $set: { status: 'offline', lastSeen: new Date() } }
+      );
+    } catch (err) {
+      console.error('[Socket] Disconnect DB error:', err.message);
+    }
+    io.emit('bot-status-update', { botUids, status: 'offline' });
+  });
+});
 
 // Register / update bot info — uses botUids as identifier, auto-creates if new
 app.post('/api/register', async (req, res) => {
@@ -76,7 +135,7 @@ app.delete('/api/bots/:botUids', async (req, res) => {
   }
 });
 
-// Mark offline if no update in 1 minute
+// Mark offline if no update in 1 minute (fallback for bots without socket)
 setInterval(async () => {
   try {
     const oneMinuteAgo = new Date(Date.now() - 60000);
@@ -89,4 +148,4 @@ setInterval(async () => {
   }
 }, 30000);
 
-app.listen(3000, () => console.log('API running on port 3000'));
+server.listen(3000, () => console.log('API running on port 3000'));

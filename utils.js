@@ -839,7 +839,7 @@ class AdilBotApis {
                         prefix,
                         timeZone,
                         language
-                });
+                }, { timeout: 15000 });
         }
 }
 

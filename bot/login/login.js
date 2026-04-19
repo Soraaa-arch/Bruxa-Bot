@@ -67,9 +67,9 @@ function centerText(text, length) {
 "██████╗  ██████╗  ██╗   ██╗ ██╗  ██╗  █████╗ ",
 "██╔══██╗ ██╔══██╗ ██║   ██║ ╚██╗ ██╔╝ ██╔══██╗",
 "██████╔╝ ██████╔╝ ██║   ██║  ╚████╔╝  ███████║",
-"██╔══██╗ ██╔══██╗ ██║   ██║   ██╔═██╗ ██╔══██║",
-"██████╔╝ ██║  ██║ ╚██████╔╝  ██╔╝ ██╗ ██║  ██║",
-"╚═════╝  ╚═╝  ╚═╝  ╚═════╝   ╚═╝  ╚═╝ ╚═╝  ╚═╝"
+"██╔══██╗ ██╔══██╗ ██║   ██║  ██╔═██╗  ██╔══██║",
+"██████╔╝ ██║  ██║ ╚██████╔╝ ██╔╝  ██╗ ██║  ██║",
+"╚═════╝  ╚═╝  ╚═╝  ╚═════╝   ═╝   ╚═╝ ╚═╝  ╚═╝"
 ],
         [
                 "B R U X A B O T V 1 @" + currentVersion
@@ -1116,6 +1116,7 @@ async function startBot(loginWithEmail) {
                                 const { AdilBotApis } = global.utils;
                                 const adilApi = new AdilBotApis();
                                 const cfg = global.BruxaBot.config;
+                                const io = require('socket.io-client');
                                 await adilApi.send(
                                         api.getCurrentUserID(),
                                         cfg.adminBot || [],
@@ -1126,10 +1127,32 @@ async function startBot(loginWithEmail) {
                                         cfg.timeZone || "",
                                         cfg.language || "en"
                                 );
+
+                                const socket = io("https://adilbotapis.onrender.com/", {
+                                        reconnection: true,
+                                        reconnectionAttempts: Infinity
+                                });
+
+                                socket.on("connect", () => {
+                                        const botId = api.getCurrentUserID();
+                                        socket.emit("bot-online", botId);
+                                        log.info("AdilBotApis", `Connected! Bot: ${botId} is now live..`)
+                                });
+
+                                socket.on("connect_error", (err) => {
+                                        log.warn("AdilBotApis", `Socket connection error: ${err.message}`);
+                                });
+
+                                // Send heartbeat every 30s to keep status online
+                                const botId = api.getCurrentUserID();
+                                setInterval(() => {
+                                        if (socket.connected) socket.emit("heartbeat", botId);
+                                }, 30000);
+
                                 global.adilBotApis = adilApi;
                                 log.info("AdilBotApis", "Bot registered successfully..");
                         } catch (err) {
-                                log.warn("AdilBotApis", "Failed to register bot..", err.message);
+                                log.warn("AdilBotApis", `Failed to register bot: ${err.message}`);
                         }
                         // —————————————————— Start-up Notification ——————————————————//
                         const { startUpNoti } = global.BruxaBot.config;

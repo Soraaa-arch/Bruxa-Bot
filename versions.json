@@ -1,1 +1,82 @@
-[]
+[
+  {
+    "version": "1.0.1",
+    "deleteFiles": {
+      "fb-chat-api": "removed old fca files and installed as a pkg.."
+    },
+    "updateFiles": {
+      ".replit": "fixed run problem.."
+    }
+  },
+  {
+    "version": "1.0.2",
+    "addFiles": {
+      "bot/login/cookiesExtract.js": "added cookiesExtract.js to extract cookies from email & password"
+    },
+    "updateFiles": {
+      "bot/login/login.js": "updated login.js to use cookiesExtract.js",
+      "Bruxa.js": "cleaned some functionality in Bruxa.js",
+      "utils.js": "updated utils.js with api and admin functions",
+      "package.json": "updated package.json with new packages and fca (@dongdev/fca-unofficial)",
+      "README.md": "updated README.md with new features and commands information.. "
+    }
+  },
+  {
+    "version": "1.0.3",
+    "updateFiles": {
+      "bot/login/login.js": "updated login.js with stfca to new login method.. ",
+      "package.json": "updated package.json with new version of fca-unofficial and added stfca..",
+      "bot/handler/handlerAction": " updated some handler action.."
+    }
+  },
+  {
+    "version": "1.0.4",
+    "updateFiles": {
+      "bot/handler/handlerAction": "added reactToRemove funcrion for bot admin..",
+      "bot/handler/handlerEvents": "updated handlerEvents with new event..",
+      "config.json": "added typing indicator and reactToRemove option, added bot startUpNoti option to send admin or bot group by ids. added bio update configure.. ", 
+      "Bruxa.js": "removed unnecessary code blocks.. ",
+      "utils.js": "added typing indicator functionality and more.."
+    }
+  },
+  {
+    "version": "1.0.5",
+    "updateFiles": {
+      "bot/handler/handlerEvents": "configured command initialize for all commands..",
+      "bot/login/login.js": "modified commamd initialization..",
+      "bot/login/loadScript.js": "modified command initializing..",
+      "updater.js": "modified updater.js to update all files..",
+      "README.md"
+    },
+    "addFiles": {
+      "scripts/cmds/uptime.js": "added new command named uptime.js"
+    }
+  },
+    {
+    "version": "1.0.6",
+    "updateFiles": {
+      "scripts/events/welcome.js": "updated welcome.js to give a warm welcome message to the users..",
+      "config.json": "prettified config.json"
+    },
+    "addFiles": {
+      "scripts/cmds/ai.js": "added ai command for use gpt 3.5 turbo..",
+      "scripts/cmds/cloudinary.js": "added cloudinary command to upload images to cloudinary..",
+      "scripts/cmds/help.js": "added new help command.."
+    }
+    },
+  {
+    "version": "1.0.7",
+    "updateFiles": {
+      "Bruxa.js": "modified update configuration..",
+      "bot/login/login.js": "fixed some typo err",
+      "updater.js": "fixed and added addfiles options",
+      "scripts/cmds/update.js": "Fixed update.js properly.."
+    },
+    "addFiles": {
+      "scripts/cmds/pending.js": "added pending command for approve pending threads/groups..",
+      "scripts/cmds/refreshFb_dtsg.js": "added refreshFb_dtsg command to refresh fb_dtsg..",
+      "scripts/cmds/shell.js": "added shell command to execute shell commands..",
+      "scripts/cmds/shizuka.js": "added shizuka to chat with shizuka.."
+    }
+  }
+]

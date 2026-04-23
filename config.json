@@ -1,7 +1,7 @@
 {
   "facebookAccount": {
-    "email": "githubceo69@mail4.uk",
-    "password": "BotAccNoPass4433",
+    "email": "",
+    "password": "",
     "twoFaSecret": "",
     "i_user": "",
     "proxy": null,
@@ -12,11 +12,13 @@
   "antiInbox": false,
   "language": "en",
   "notesLanguage": "change to your language with ISO 639-1 code, available languages: vi (Vietnamese), en (English)",
+  
+  ## Bot Configuration 
   "nickNameBot": "BruxaBot",
   "prefix": "/",
   "bio": {
     "enabled": true,
-    "bioText": "Bot is connected..",
+    "bioText": "Bot is connected and running..",
     "updateOnce": true
   },
   "adminOnly": {
@@ -60,10 +62,10 @@
       ]
     },
     "adminId": {
-      "enabled": true,
+      "enabled": false,
       "admin": "100075808585925"
     },
-    "message": "Bot is connected..",
+    "message": "🤖 Bot is online..📢",
     "notes": "You can set the message to be sent when the bot is connected.."
   },
   "reactOptions": {
@@ -170,6 +172,6 @@
     "selfListenEvent": true,
     "autoMarkDelivery": false,
     "autoReconnect": false,
-    "notes": "Document here: https://github.com/ntkhang03/fb-chat-api/blob/master/DOCS.md#apisetoptionsoptions "
+    "notes": "Document here: https://github.com/sheikhtamimlover/ST-FCA.git"
   }
 }

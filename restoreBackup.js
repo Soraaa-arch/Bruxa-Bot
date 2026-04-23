@@ -63,4 +63,3 @@ function recursiveReadDirAndBackup(pathFileOrFolder) {
 
 	log.info("SUCCESS", `Restore backup ${versionBackup} success`);
 })();
-

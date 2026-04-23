@@ -88,9 +88,9 @@ module.exports = (api, threadModel, userModel, dashBoardModel, globalModel, user
 		if (!handlerChat)
 			return;
 
-		const {
+		const { 
 			onAnyEvent, onFirstChat, onStart, onChat,
-			onReply, onEvent, handlerEvent, onReaction,
+			onReply, onEvent, handlerEvent,onReaction, 
 			typ, presence, read_receipt
 		} = handlerChat;
 

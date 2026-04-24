@@ -1,6 +1,6 @@
 {
   "name": "bruxa-bot",
-  "version": "1.0.8",
+  "version": "1.0.10",
   "description": "A simple Bot chat messenger using personal account. Made by Rakib Adil",
   "main": "index.js",
   "engines": {
@@ -9,7 +9,6 @@
   },
   "dependencies": {
     "@distube/ytdl-core": "^4.16.12",
-    "@dongdev/fca-unofficial": "^3.0.31",
     "axios": "^1.13.4",
     "bcrypt": "^5.0.1",
     "canvas": "^3.2.0",
@@ -57,6 +56,7 @@
     "st-shazam": "^1.0.1",
     "stencyption": "^1.0.10",
     "stfca": "^1.0.25",
+    "stream": "^0.0.3",
     "tinyurl": "^1.1.7",
     "totp-generator": "^0.0.13",
     "tweetnacl-sealedbox-js": "^1.2.0",

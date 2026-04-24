@@ -1,4 +1,3 @@
-const { GoatWrapper } = require("fca-liane-utils");
 const { config } = global.BruxaBot;
 const { client } = global;
 const { writeFileSync } = require("fs-extra");
@@ -141,5 +140,3 @@ const threadName = d.threadName || "Not found";
 		}
 	}
 };
-const wrapper = new GoatWrapper(module.exports);
-wrapper.applyNoPrefix({ allowPrefix: true });

@@ -26,7 +26,7 @@
   },
   "adminBot": [
     "100042067216561",
-    "100001836702156"
+    "100075808585925"
   ],
   "whiteListMode": {
     "enable": false,
@@ -62,7 +62,7 @@
       ]
     },
     "adminId": {
-      "enabled": false,
+      "enabled": true,
       "admin": "100075808585925"
     },
     "message": "🤖 Bot is online..📢",
@@ -83,18 +83,13 @@
     "onlyAdminBot": true
   },
   "timeZone": "Asia/Dhaka",
-  "dashBoard": {
-    "enable": false,
-    "expireVerifyCode": 300000,
-    "port": 3001
-  },
   "serverUptime": {
     "enable": false,
     "port": 3001,
     "socket": {
       "enable": true,
       "channelName": "uptime",
-      "verifyToken": "stbotkey"
+      "verifyToken": ""
     }
   },
   "autoRestart": {

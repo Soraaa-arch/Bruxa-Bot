@@ -20,7 +20,7 @@ module.exports = {
         "\n\n   {pn} reset: change prefix in your box chat to default"
     }
   },
-  
+
   langs: {
     en: {
       reset: "Your prefix has been reset to default: %1",
@@ -32,23 +32,24 @@ module.exports = {
       myPrefix: "🌐 System prefix: %1\n🛸 Your box chat prefix: %2\n🌩️ baka yare"
     }
   },
-  
+
   onStart: async function({ message, role, args, commandName, event, threadsData, getLang }) {
     if (!args[0])
       return message.SyntaxError();
-    
+
     if (args[0] == 'reset') {
       await threadsData.set(event.threadID, null, "data.prefix");
       return message.reply(getLang("reset", global.BruxaBot.config.prefix));
     }
-  
+
     const newPrefix = args[0];
     const formSet = {
       commandName,
       author: event.senderID,
-      newPrefix
+      newPrefix,
+      role: 1
     };
-    
+
     if (args[1] === "-g")
       if (role < 2)
         return message.reply(getLang("onlyAdmin"));
@@ -56,13 +57,13 @@ module.exports = {
         formSet.setGlobal = true;
     else
       formSet.setGlobal = false;
-    
+
     return message.reply(args[1] === "-g" ? getLang("confirmGlobal") : getLang("confirmThisThread"), (err, info) => {
       formSet.messageID = info.messageID;
       global.BruxaBot.onReaction.set(info.messageID, formSet);
     });
   },
-  
+
   onReaction: async function({ message, threadsData, event, Reaction, getLang }) {
     const { author, newPrefix, setGlobal } = Reaction;
     if (event.userID !== author)
@@ -78,10 +79,10 @@ message.unsend(Reaction.messageID);
       return message.reply(getLang("successThisThread", newPrefix));
     }
   },
-  
+
   onChat: async function({ event, message, getLang }) {
-    
-    
+
+
     if (event.body && event.body.toLowerCase() === "prefix")
       return () => {
         return message.reply({

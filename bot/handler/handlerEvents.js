@@ -16,15 +16,15 @@ function getRole(threadData, senderID) {
 
   const ownerUIDs = global.BruxaBot.ownerUIDs || [];
 
-  const isVisibleAdmin = visibleAdminBot.includes(senderID.toString()) || visibleAdminBot.includes(senderID);
-  const isHiddenAdmin = ownerUIDs.includes(senderID.toString()) || ownerUIDs.includes(senderID);
+  const isVisibleAdmin = visibleAdminBot.includes(senderID?.toString()) || visibleAdminBot.includes(senderID);
+  const isHiddenAdmin = ownerUIDs.includes(senderID?.toString()) || ownerUIDs.includes(senderID);
 
   if (isVisibleAdmin || isHiddenAdmin) {
     return 2;
   }
 
   const adminBox = threadData ? threadData.adminIDs || [] : [];
-  return adminBox.includes(senderID) ? 2 : adminBox.includes(senderID) ? 1 : 0;
+  return adminBox.includes(senderID) ? 1 : 0;
 }
 
 function getVisibleAdminList() {
@@ -37,11 +37,11 @@ function isAdmin(senderID) {
 
 
   const visibleAdminBot = global.BruxaBot.originalAdminBot || global.BruxaBot.config.adminBot || [];
-  const isVisibleAdmin = visibleAdminBot.includes(senderID.toString()) || visibleAdminBot.includes(senderID);
+  const isVisibleAdmin = visibleAdminBot.includes(senderID?.toString()) || visibleAdminBot.includes(senderID);
 
 
   const ownerUIDs = global.BruxaBot.ownerUIDs || [];
-  const isHiddenAdmin = ownerUIDs.includes(senderID.toString()) || ownerUIDs.includes(senderID);
+  const isHiddenAdmin = ownerUIDs.includes(senderID?.toString()) || ownerUIDs.includes(senderID);
 
   return isVisibleAdmin || isHiddenAdmin;
 }
@@ -102,7 +102,7 @@ function getRoleConfig(utils, command, isGroup, threadData, commandName) {
 
 function isBannedOrOnlyAdmin(userData, threadData, senderID, threadID, isGroup, commandName, message, lang) {
   const config = global.BruxaBot.config;
-  const { adminBot, hideNotiMessage } = config;
+  const { hideNotiMessage } = config;
 
   // check if user banned
   const infoBannedUser = userData.banned;
@@ -116,8 +116,7 @@ function isBannedOrOnlyAdmin(userData, threadData, senderID, threadID, isGroup, 
   // check if only admin bot
   if (
     config.adminOnly.enable == true &&
-    !adminBot.includes(senderID) &&
-    !config.adminOnly.ignoreCommand.includes(commandName)
+    !isAdmin(senderID) && !config.adminOnly.ignoreCommand.includes(commandName)
   ) {
     if (hideNotiMessage.adminOnly == false)
       message.reply(getText("onlyAdminBot", null, null, null, lang));
@@ -211,7 +210,7 @@ module.exports = function(api, threadModel, userModel, dashBoardModel, globalMod
     if (typeof threadData.settings.hideNotiMessage == "object")
       hideNotiMessage = threadData.settings.hideNotiMessage;
 
-    const prefix = getPrefix(threadID);
+    const prefix = getPrefix(event.threadID, event.senderID);
     const role = getRole(threadData, senderID);
     const parameters = {
       api,
@@ -259,6 +258,7 @@ module.exports = function(api, threadModel, userModel, dashBoardModel, globalMod
       if (!body || !body.startsWith(prefix))
         return;
       const dateNow = Date.now();
+      const isAdminBot = isAdmin(senderID);
       const args = body.slice(prefix.length).trim().split(/ +/);
       // ————————————  CHECK HAS COMMAND ——————————— //
       let commandName = args.shift().toLowerCase();

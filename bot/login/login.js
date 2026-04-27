@@ -232,383 +232,231 @@ if (showTitle) {
 // ─── Get appState from email/password ────────
 async function getAppStateFromEmail(
   spinRef = { _start: () => {}, _stop: () => {} },
-  accountInfo,
+  accountInfo
 ) {
   const { email, password, userAgent, proxy, twoFaSecret } = accountInfo;
   const getFbstate = require("./getFbstate1.js");
-  let code2FATemp, appState;
+  let appState;
 
   try {
-    try {
-      appState = await getFbstate(
-        checkAndTrimString(email),
-        checkAndTrimString(password),
-        userAgent,
-        proxy,
-      );
-      spinRef._stop();
-    } catch (err) {
-      if (err.continue) {
-        let tryNumber = 0,
-          isExit = false;
+    // ── Try direct credential login 
+    appState = await getFbstate(
+      checkAndTrimString(email),
+      checkAndTrimString(password),
+      userAgent,
+      proxy
+    );
+    spinRef._stop();
 
-        await (async function submitCode(message) {
-          if (message && isExit) {
-            spinRef._stop();
-            log.error("LOGIN FACEBOOK", message);
-            process.exit();
-          }
-          if (message) {
-            spinRef._stop();
-            log.warn("LOGIN FACEBOOK", message);
-          }
-
-          if (twoFaSecret && tryNumber === 0) {
-            const isImage = [".png", ".jpg", ".jpeg"].some((e) =>
-              twoFaSecret.endsWith(e),
-            );
-            code2FATemp = isImage
-              ? (
-                  await qr.readQrCode(`${process.cwd()}/${twoFaSecret}`)
-                ).replace(/.*secret=(.*)&digits.*/g, "$1")
-              : twoFaSecret;
-          } else {
-            spinRef._stop();
-            code2FATemp = await input("> Enter 2FA code or secret: ");
-            readline.moveCursor(process.stderr, 0, -1);
-            readline.clearScreenDown(process.stderr);
-          }
-
-          const code2FA = isNaN(code2FATemp)
-            ? toptp(
-                code2FATemp
-                  .normalize("NFD")
-                  .toLowerCase()
-                  .replace(/[\u0300-\u036f]/g, "")
-                  .replace(/[đĐ]/g, (x) => (x === "đ" ? "d" : "D"))
-                  .replace(/\(|\)|,/g, "")
-                  .replace(/ /g, ""),
-              )
-            : code2FATemp;
-
-          spinRef._start();
-          try {
-            appState = JSON.parse(JSON.stringify(await err.continue(code2FA)));
-            appState = appState
-              .map((i) => ({
-                key: i.key,
-                value: i.value,
-                domain: i.domain,
-                path: i.path,
-                hostOnly: i.hostOnly,
-                creation: i.creation,
-                lastAccessed: i.lastAccessed,
-              }))
-              .filter((i) => i.key);
-            spinRef._stop();
-          } catch (e) {
-            tryNumber++;
-            if (!e.continue) isExit = true;
-            await submitCode(e.message);
-          }
-        })(err.message);
-      } else throw err;
-    }
   } catch (err) {
-    try {
-      const { getAccountCookies } = require("./cookiesExtract.js");
-      appState = await getAccountCookies(twoFaSecret || null);
+
+    // ── 2FA checkpoint ──
+    if (err.continue) {
+      let tryNumber = 0, isExit = false;
+
+      await (async function submitCode(message) {
+        if (message && isExit) {
+          spinRef._stop();
+          log.error("LOGIN FACEBOOK", message);
+          process.exit();
+        }
+        if (message) { spinRef._stop(); log.warn("LOGIN FACEBOOK", message); }
+
+        // Use saved twoFaSecret on first try, otherwise prompt
+        let code2FATemp = (twoFaSecret && tryNumber === 0) ? twoFaSecret : null;
+        if (!code2FATemp) {
+          spinRef._stop();
+          code2FATemp = await input("> Enter 2FA code or secret: ");
+          readline.moveCursor(process.stderr, 0, -1);
+          readline.clearScreenDown(process.stderr);
+        }
+
+        // Handle QR image path
+        if (typeof code2FATemp === "string" &&
+            [".png", ".jpg", ".jpeg"].some(e => code2FATemp.endsWith(e))) {
+          code2FATemp = (await qr.readQrCode(`${process.cwd()}/${code2FATemp}`))
+            .replace(/.*secret=(.*)&digits.*/g, "$1");
+        }
+
+        const code2FA = isNaN(code2FATemp)
+          ? toptp(
+              code2FATemp.normalize("NFD").toLowerCase()
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/[đĐ]/g, x => x === "đ" ? "d" : "D")
+                .replace(/\(|\)|,/g, "")
+                .replace(/ /g, "")
+            )
+          : code2FATemp;
+
+        spinRef._start();
+        try {
+          appState = JSON.parse(JSON.stringify(await err.continue(code2FA)));
+          appState = appState.map(i => ({
+            key: i.key, value: i.value, domain: i.domain,
+            path: i.path, hostOnly: i.hostOnly,
+            creation: i.creation, lastAccessed: i.lastAccessed,
+          })).filter(i => i.key);
+          spinRef._stop();
+        } catch (e) {
+          tryNumber++;
+          if (!e.continue) isExit = true;
+          await submitCode(e.message);
+        }
+      })(err.message);
+
+    } else {
       spinRef._stop();
-    } catch (fallbackErr) {
-      throw new Error(
-        `Login failed: ${err.message}. Fallback also failed: ${fallbackErr.message}`,
-      );
+      log.warn("LOGIN FACEBOOK", `Credentials failed: ${err.message}`);
+      log.warn("LOGIN FACEBOOK", "Trying existing cookies from account.txt..");
+
+      if (existsSync(dirAccount)) {
+        const accountText = readFileSync(dirAccount, "utf8").trim();
+        if (accountText) {
+          try {
+            const existing = JSON.parse(accountText);
+            if (Array.isArray(existing) && existing.length > 0) {
+              log.warn("LOGIN FACEBOOK", "⚠️ Using existing cookies as fallback — consider updating credentials");
+              return existing;
+            }
+          } catch {}
+        }
+      }
+
+      throw new Error(`Login failed: ${err.message} — no valid fallback cookies in account.txt`);
     }
   }
+
+  // ── Save fresh cookies.. 
+  writeFileSync(dirAccount, JSON.stringify(filterKeysAppState(appState), null, 2));
+  log.info("LOGIN FACEBOOK", "✅ Fresh cookies saved to account.txt");
 
   return appState;
 }
 
-// ─── Resolve appState to login with ─────────
 async function getAppStateToLogin(loginWithEmail) {
   if (loginWithEmail) {
     return await getAppStateFromEmail(undefined, {
-      email: facebookAccountConfig.email,
-      password: facebookAccountConfig.password,
-      userAgent: facebookAccountConfig.userAgent,
-      proxy: facebookAccountConfig.proxy,
+      email:       facebookAccountConfig.email,
+      password:    facebookAccountConfig.password,
+      userAgent:   facebookAccountConfig.userAgent,
+      proxy:       facebookAccountConfig.proxy,
       twoFaSecret: facebookAccountConfig.twoFaSecret,
     });
   }
 
   if (!existsSync(dirAccount))
-    return log.error(
-      "LOGIN FACEBOOK",
-      getText("login", "notFoundDirAccount", colors.green(dirAccount)),
-    );
+    return log.error("LOGIN FACEBOOK", getText("login", "notFoundDirAccount", colors.green(dirAccount)));
 
   const accountText = readFileSync(dirAccount, "utf8");
 
-  // ── account.txt is empty ─────
   if (!accountText || !accountText.trim()) {
-    log.info(
-      "Login Facebook",
-      "account.txt is empty, trying config.json credentials..",
-    );
+    log.info("Login Facebook", "account.txt is empty, trying config.json credentials..");
 
     if (facebookAccountConfig.email && facebookAccountConfig.password) {
-      try {
-        log.info(
-          "Login Facebook",
-          `Using email: ${facebookAccountConfig.email}`,
-        );
-        spin = createOraDots("Logging in with config credentials..");
-        spin._start();
-
-        const {
-          getAccountCookies,
-          handle2FAFlow,
-        } = require("./cookiesExtract.js");
-        const twoFaSecret = facebookAccountConfig.twoFaSecret || null;
-        const loginResult = await getAccountCookies(twoFaSecret);
-
-        if (loginResult.requires2FA) {
-          spin._stop();
-          log.warn("Login Facebook", "2FA checkpoint detected..");
-          let secret = twoFaSecret;
-          if (!secret) {
-            secret = await input(">>> Enter your 2FA secret or 6-digit code: ");
-            readline.moveCursor(process.stderr, 0, -1);
-            readline.clearScreenDown(process.stderr);
-          }
-          spin._start();
-          const result2FA = await handle2FAFlow(loginResult, secret);
-          if (result2FA.success) {
-            facebookAccountConfig.twoFaSecret = secret;
-            writeFileSync(
-              global.client.dirConfig,
-              JSON.stringify(global.BruxaBot.config, null, 2),
-            );
-            log.info("Login Facebook", "2FA secret saved to config.json");
-            writeFileSync(
-              dirAccount,
-              JSON.stringify(result2FA.cookies, null, 2),
-            );
-            log.info(
-              "LOGIN FACEBOOK",
-              "Login with 2FA successful, cookies saved",
-            );
-            spin._stop();
-            return result2FA.cookies;
-          } else {
-            throw new Error("2FA flow did not succeed");
-          }
-        } else if (loginResult.cookies?.length > 0) {
-          writeFileSync(
-            dirAccount,
-            JSON.stringify(loginResult.cookies, null, 2),
-          );
-          log.info("LOGIN FACEBOOK", "Login successful, cookies saved");
-          spin._stop();
-          return loginResult.cookies;
-        }
-      } catch (err) {
-        spin?._stop();
-        log.error(
-          "LOGIN FACEBOOK",
-          "Config credential login failed:",
-          err.message,
-        );
-        log.warn("LOGIN FACEBOOK", "Falling back to manual login..");
-      }
-    } else {
-      log.info("LOGIN FACEBOOK", "No email/password in config.json");
+      spin = createOraDots("Logging in with credentials..");
+      spin._start();
+      return await getAppStateFromEmail(spin, {
+        email:       facebookAccountConfig.email,
+        password:    facebookAccountConfig.password,
+        userAgent:   facebookAccountConfig.userAgent,
+        proxy:       facebookAccountConfig.proxy,
+        twoFaSecret: facebookAccountConfig.twoFaSecret,
+      });
     }
 
-    // ── Manual login prompt ──
-    log.info("LOGIN FACEBOOK", "Please provide login credentials:");
-    const email = await input("> Facebook email / phone: ");
+    log.info("LOGIN FACEBOOK", "No credentials in config.json — please enter them:");
+    const email    = await input("> Facebook email / phone: ");
     const password = await input("> Facebook password: ", true);
 
+    // Save to config for next time
+    facebookAccountConfig.email    = email;
+    facebookAccountConfig.password = password;
     try {
-      facebookAccountConfig.email = email;
-      facebookAccountConfig.password = password;
-      writeFileSync(
-        global.client.dirConfig,
-        JSON.stringify(global.BruxaBot.config, null, 2),
-      );
+      writeFileSync(global.client.dirConfig, JSON.stringify(global.BruxaBot.config, null, 2));
       log.info("LOGIN FACEBOOK", "Credentials saved to config.json");
     } catch (e) {
       log.warn("LOGIN FACEBOOK", "Could not save credentials:", e.message);
     }
 
-    const { getAccountCookies, handle2FAFlow } = require("./cookiesExtract.js");
-    const twoFaSecret = facebookAccountConfig.twoFaSecret || null;
-    const loginResult = await getAccountCookies(twoFaSecret);
-
-    if (loginResult.requires2FA) {
-      log.warn("LOGIN FACEBOOK", "2FA checkpoint detected");
-      let secret =
-        twoFaSecret ||
-        (await input("> Enter your 6-digit 2FA code or secret: "));
-      readline.moveCursor(process.stderr, 0, -1);
-      readline.clearScreenDown(process.stderr);
-      const result2FA = await handle2FAFlow(loginResult, secret);
-      if (result2FA.success) {
-        facebookAccountConfig.twoFaSecret = secret;
-        writeFileSync(
-          global.client.dirConfig,
-          JSON.stringify(global.BruxaBot.config, null, 2),
-        );
-        log.info("LOGIN FACEBOOK", "2FA saved to config.json");
-        return result2FA.cookies;
-      }
-    }
-
-    return loginResult.cookies;
+    return await getAppStateFromEmail({ _start: () => {}, _stop: () => {} }, {
+      email, password,
+      userAgent:   facebookAccountConfig.userAgent,
+      proxy:       facebookAccountConfig.proxy,
+      twoFaSecret: facebookAccountConfig.twoFaSecret,
+    });
   }
 
-  // ── Parse account.txt ──────
+  // ── Parse account.txt ──
   let appState = [];
   try {
     if (accountText.startsWith("EAAAA") || accountText.startsWith("EAAD6V7")) {
       spin = createOraDots(getText("login", "loginToken"));
       spin._start();
-      try {
-        appState = await require("./getFbstate.js")(accountText);
-      } catch (err) {
-        err.name = "TOKEN_ERROR";
-        throw err;
-      }
+      try { appState = await require("./getFbstate.js")(accountText); }
+      catch (err) { err.name = "TOKEN_ERROR"; throw err; }
+
     } else if (accountText.match(/^(?:\s*\w+\s*=\s*[^;]*;?)+/)) {
       spin = createOraDots(getText("login", "loginCookieString"));
       spin._start();
-      appState = accountText
-        .split(";")
-        .map((i) => {
-          const [key, ...v] = i.split("=");
-          return {
-            key: (key || "").trim(),
-            value: (v.join("=") || "").trim(),
-            domain: "facebook.com",
-            path: "/",
-            hostOnly: true,
-            creation: new Date().toISOString(),
-            lastAccessed: new Date().toISOString(),
-          };
-        })
-        .filter((i) => i.key && i.value && i.key !== "x-referer");
+      appState = accountText.split(";").map(i => {
+        const [key, ...v] = i.split("=");
+        return {
+          key: (key || "").trim(), value: (v.join("=") || "").trim(),
+          domain: "facebook.com", path: "/", hostOnly: true,
+          creation: new Date().toISOString(), lastAccessed: new Date().toISOString(),
+        };
+      }).filter(i => i.key && i.value && i.key !== "x-referer");
+
     } else if (isNetScapeCookie(accountText)) {
       spin = createOraDots(getText("login", "loginCookieNetscape"));
       spin._start();
       appState = netScapeToCookies(accountText);
+
     } else {
       spin = createOraDots(getText("login", "loginCookieArray"));
       spin._start();
-      try {
-        appState = JSON.parse(accountText);
-      } catch {
+      try { appState = JSON.parse(accountText); }
+      catch {
         const e = new Error(`${path.basename(dirAccount)} is invalid`);
-        e.name = "ACCOUNT_ERROR";
-        throw e;
+        e.name = "ACCOUNT_ERROR"; throw e;
       }
 
-      if (appState.some((i) => i.name))
-        appState = appState.map((i) => {
-          i.key = i.name;
-          delete i.name;
-          return i;
-        });
-      else if (!appState.some((i) => i.key)) {
+      if (appState.some(i => i.name))
+        appState = appState.map(i => { i.key = i.name; delete i.name; return i; });
+      else if (!appState.some(i => i.key)) {
         const e = new Error(`${path.basename(dirAccount)} is invalid`);
-        e.name = "ACCOUNT_ERROR";
-        throw e;
+        e.name = "ACCOUNT_ERROR"; throw e;
       }
 
-      appState = appState
-        .map((i) => ({
-          ...i,
-          domain: "facebook.com",
-          path: "/",
-          hostOnly: false,
-          creation: new Date().toISOString(),
-          lastAccessed: new Date().toISOString(),
-        }))
-        .filter((i) => i.key && i.value && i.key !== "x-referer");
+      appState = appState.map(i => ({
+        ...i, domain: "facebook.com", path: "/", hostOnly: false,
+        creation: new Date().toISOString(), lastAccessed: new Date().toISOString(),
+      })).filter(i => i.key && i.value && i.key !== "x-referer");
     }
 
-    const cookieStr = appState.map((i) => `${i.key}=${i.value}`).join("; ");
-    const isValid = await checkLiveCookie(
-      cookieStr,
-      facebookAccountConfig.userAgent,
-    );
-    if (!isValid)
-      log.warn(
-        "LOGIN FACEBOOK",
-        "Cookie validation failed, continuing anyway..",
-      );
+    const cookieStr = appState.map(i => `${i.key}=${i.value}`).join("; ");
+    const isValid = await checkLiveCookie(cookieStr, facebookAccountConfig.userAgent);
+    if (!isValid) log.warn("LOGIN FACEBOOK", "Cookie validation failed, continuing anyway..");
+
   } catch (err) {
     spin?._stop();
     if (err.name === "TOKEN_ERROR")
-      log.err(
-        "LOGIN FACEBOOK",
-        getText(
-          "login",
-          "tokenError",
-          colors.green("EAAAA or EAAD6V7.."),
-          colors.green(dirAccount),
-        ),
-      );
+      log.err("LOGIN FACEBOOK", getText("login", "tokenError", colors.green("EAAAA or EAAD6V7.."), colors.green(dirAccount)));
     else if (err.name === "COOKIE_INVALID")
       log.err("LOGIN FACEBOOK", getText("login", "cookieError"));
 
-    log.info("Login Facebook", "Please provide login credentials:");
-    const email = await input("> Facebook email / phone: ");
-    const password = await input("> Facebook password: ", true);
-
-    try {
-      facebookAccountConfig.email = email;
-      facebookAccountConfig.password = password;
-      writeFileSync(
-        global.client.dirConfig,
-        JSON.stringify(global.BruxaBot.config, null, 2),
-      );
-      log.info("LOGIN FACEBOOK", "Credentials saved to config.json");
-    } catch (e) {
-      log.warn("LOGIN FACEBOOK", "Could not save credentials:", e.message);
-    }
-
-    try {
-      const {
-        getAccountCookies,
-        handle2FAFlow,
-      } = require("./cookiesExtract.js");
-      const twoFaSecret = facebookAccountConfig.twoFaSecret || null;
-      const loginResult = await getAccountCookies(twoFaSecret);
-
-      if (loginResult.requires2FA) {
-        log.warn("LOGIN FACEBOOK", "2FA checkpoint detected");
-        let secret =
-          twoFaSecret ||
-          (await input("> Enter your 6-digit 2FA code or secret: "));
-        readline.moveCursor(process.stderr, 0, -1);
-        readline.clearScreenDown(process.stderr);
-        const result2FA = await handle2FAFlow(loginResult, secret);
-        if (result2FA.success) {
-          facebookAccountConfig.twoFaSecret = secret;
-          writeFileSync(
-            global.client.dirConfig,
-            JSON.stringify(global.BruxaBot.config, null, 2),
-          );
-          appState = result2FA.cookies;
-        }
-      } else {
-        appState = loginResult.cookies;
-      }
-      log.info("LOGIN FACEBOOK", "Manual login successful");
-    } catch (e) {
-      log.err("LOGIN FACEBOOK", "Manual login failed:", e.message);
-      process.exit();
+    // Fallback.. 
+    if (facebookAccountConfig.email && facebookAccountConfig.password) {
+      log.info("LOGIN FACEBOOK", "account.txt invalid — trying credentials..");
+      spin = createOraDots("Logging in with credentials..");
+      spin._start();
+      return await getAppStateFromEmail(spin, {
+        email:       facebookAccountConfig.email,
+        password:    facebookAccountConfig.password,
+        userAgent:   facebookAccountConfig.userAgent,
+        proxy:       facebookAccountConfig.proxy,
+        twoFaSecret: facebookAccountConfig.twoFaSecret,
+      });
     }
   }
 
@@ -625,48 +473,6 @@ function stopListening(keyListen) {
       resolve();
     }) || resolve();
   });
-}
-
-// ------ Uptime server ------
-let serverUptimeRunning = false;
-async function startUptimeServer() {
-  if (serverUptimeRunning) return;
-  if (!global.BruxaBot.config.serverUptime?.enable) return;
-
-  try {
-    const http = require("http");
-    const express = require("express");
-    const app = express();
-    const server = http.createServer(app);
-    const PORT = global.BruxaBot.config.serverUptime?.port || 3001;
-
-    // Fetch homepage HTML once on start
-    let homepageHtml = "<h1>BruxaBot is running 👾</h1>";
-    // Home route — show bot status page
-    app.get("/", (req, res) => res.send(homepageHtml));
-
-    // Uptime ping route — used by UptimeRobot etc.
-    app.get("/uptime", (req, res) => global.responseUptimeCurrent(req, res));
-
-    await new Promise((resolve, reject) =>
-      server.listen(PORT, resolve).on("error", reject),
-    );
-
-    const nameUpTime = process.env.REPL_OWNER
-      ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`
-      : process.env.API_SERVER_EXTERNAL === "https://api.glitch.com"
-        ? `https://${process.env.PROJECT_DOMAIN}.glitch.me`
-        : `http://localhost:${PORT}`;
-
-    log.info("UPTIME", getText("login", "openServerUptimeSuccess", nameUpTime));
-
-    if (global.BruxaBot.config.serverUptime?.socket?.enable)
-      require("./socketIO.js")(server);
-
-    serverUptimeRunning = true;
-  } catch (err) {
-    log.err("UPTIME", getText("login", "openServerUptimeError"), err);
-  }
 }
 
 // ─── Main bot start ──────────
@@ -883,74 +689,6 @@ async function startBot(loginWithEmail) {
             );
         }
 
-        // ── Bot info ───────
-        let hasBanned = false;
-        const botID = api.getCurrentUserID();
-        const userInfo = await api.getUserInfo(botID);
-        const botName = userInfo[botID]?.name || "Unknown";
-
-        logColor("#f5ab00", createLine("BOT INFO"));
-        log.info("NODE VERSION", process.version);
-        log.info("BOT VERSION", currentVersion);
-        log.info("BOT ID", `${botID} - ${botName}`);
-        log.info("PREFIX", global.BruxaBot.config.prefix);
-        log.info("LANGUAGE", global.BruxaBot.config.language);
-        log.info(
-          "BOT NICK NAME",
-          global.BruxaBot.config.nickNameBot || "BRUXA BOT",
-        );
-
-        // ── GBAN check ───────
-        let dataGban = {};
-        try {
-          const gbanRes = await axios.get(
-            "https://raw.githubusercontent.com/ntkhang03/Goat-Bot-V2-Gban/master/gban.json",
-          );
-          dataGban = gbanRes.data;
-
-          const checkBan = async (uid) => {
-            if (!dataGban[uid]) return false;
-            if (!dataGban[uid].toDate) return true;
-            const now = new Date(
-              (
-                await axios.get("http://worldtimeapi.org/api/timezone/UTC")
-              ).data.utc_datetime,
-            ).getTime();
-            return now < new Date(dataGban[uid].date).getTime();
-          };
-
-          if (await checkBan(botID)) {
-            log.err(
-              "GBAN",
-              getText(
-                "login",
-                "gbanMessage",
-                dataGban[botID]?.date,
-                dataGban[botID]?.reason,
-              ),
-            );
-            hasBanned = true;
-          }
-          for (const uid of global.BruxaBot.config.adminBot) {
-            if (await checkBan(uid)) {
-              log.err(
-                "GBAN",
-                getText(
-                  "login",
-                  "gbanMessage",
-                  dataGban[uid]?.date,
-                  dataGban[uid]?.reason,
-                ),
-              );
-              hasBanned = true;
-            }
-          }
-          if (hasBanned) process.exit();
-        } catch {
-          log.err("GBAN", getText("login", "checkGbanError"));
-          process.exit();
-        }
-
         // ── Notification banner ───────
         let notification = "";
         try {
@@ -1005,40 +743,6 @@ async function startBot(loginWithEmail) {
           globalData,
         } = await require("./loadData.js")(api, createLine);
 
-        // ── Bio update ──────
-        const { bio } = global.BruxaBot.config;
-        if (bio?.enabled && bio.bioText) {
-          try {
-            if (bio.updateOnce) {
-              const hasUpdated = await globalData.get(
-                "bioUpdateStatus",
-                "hasUpdatedBio",
-                false,
-              );
-              if (!hasUpdated) {
-                await api.changeBio(bio.bioText, false);
-                try {
-                  await globalData.set("bioUpdateStatus", {
-                    hasUpdatedBio: true,
-                  });
-                } catch {
-                  await globalData.create("bioUpdateStatus", {
-                    data: { hasUpdatedBio: true },
-                  });
-                }
-                log.info("BIO UPDATE", `✅ Bio updated: "${bio.bioText}"`);
-              } else {
-                log.info("BIO UPDATE", "Already updated, skipping..");
-              }
-            } else {
-              await api.changeBio(bio.bioText, false);
-              log.info("BIO UPDATE", `✅ Bio updated: "${bio.bioText}"`);
-            }
-          } catch (err) {
-            log.error("BIO UPDATE", "Failed:", err.message);
-          }
-        }
-
         // ── Custom + load scripts ────────
         await require("../custom.js")({
           api,
@@ -1065,7 +769,6 @@ async function startBot(loginWithEmail) {
           createLine,
         );
 
-        // ── Auto reload scripts watcher ─────
         if (global.BruxaBot.config.autoLoadScripts?.enable) {
           const ignoreCmds =
             global.BruxaBot.config.autoLoadScripts.ignoreCmds
@@ -1142,6 +845,108 @@ async function startBot(loginWithEmail) {
           watchScript("events", ignoreEvents);
         }
 
+        // ---- Bot Info ----
+        let hasBanned = false;
+        const botID = api.getCurrentUserID();
+        const userInfo = await api.getUserInfo(botID);
+        const botName = userInfo[botID]?.name || "Unknown";
+
+        logColor("#f5ab00", createLine("BOT INFO"));
+        log.info("NODE VERSION", process.version);
+        log.info("BOT VERSION", currentVersion);
+        log.info("BOT ID", `${botID} - ${botName}`);
+        log.info("PREFIX", global.BruxaBot.config.prefix);
+        log.info("LANGUAGE", global.BruxaBot.config.language);
+        log.info(
+          "BOT NICK NAME",
+          global.BruxaBot.config.nickNameBot || "BRUXA BOT",
+        );
+
+        // ── Bio update ─────
+        const { bio } = global.BruxaBot.config;
+        if (bio?.enabled && bio.bioText) {
+          try {
+            if (bio.updateOnce) {
+              const hasUpdated = await globalData.get(
+                "bioUpdateStatus",
+                "hasUpdatedBio",
+                false,
+              );
+              if (!hasUpdated) {
+                await api.changeBio(bio.bioText, false);
+                try {
+                  await globalData.set("bioUpdateStatus", {
+                    hasUpdatedBio: true,
+                  });
+                } catch {
+                  await globalData.create("bioUpdateStatus", {
+                    data: { hasUpdatedBio: true },
+                  });
+                }
+                log.info("BIO UPDATE", `✅ Bio updated: "${bio.bioText}"`);
+              } else {
+                log.info("BIO UPDATE", "Already updated, skipping..");
+              }
+            } else {
+              await api.changeBio(bio.bioText, false);
+              log.info("BIO UPDATE", `✅ Bio updated: "${bio.bioText}"`);
+            }
+          } catch (err) {
+            log.error("BIO UPDATE", "Failed:", err.message);
+          }
+        }
+
+        // ── GBAN check ───────
+        let dataGban = {};
+        try {
+          const gbanRes = await axios.get(
+            "https://raw.githubusercontent.com/ntkhang03/Goat-Bot-V2-Gban/master/gban.json",
+          );
+          dataGban = gbanRes.data;
+
+          const checkBan = async (uid) => {
+            if (!dataGban[uid]) return false;
+            if (!dataGban[uid].toDate) return true;
+            const now = new Date(
+              (
+                await axios.get("http://worldtimeapi.org/api/timezone/UTC")
+              ).data.utc_datetime,
+            ).getTime();
+            return now < new Date(dataGban[uid].date).getTime();
+          };
+
+          if (await checkBan(botID)) {
+            log.err(
+              "GBAN",
+              getText(
+                "login",
+                "gbanMessage",
+                dataGban[botID]?.date,
+                dataGban[botID]?.reason,
+              ),
+            );
+            hasBanned = true;
+          }
+          for (const uid of global.BruxaBot.config.adminBot) {
+            if (await checkBan(uid)) {
+              log.err(
+                "GBAN",
+                getText(
+                  "login",
+                  "gbanMessage",
+                  dataGban[uid]?.date,
+                  dataGban[uid]?.reason,
+                ),
+              );
+              hasBanned = true;
+            }
+          }
+          if (hasBanned) process.exit();
+        } catch {
+          log.err("GBAN", getText("login", "checkGbanError"));
+          process.exit();
+        }
+
         // ── Admin bot list ───────
         logColor("#f5ab00", character);
         let i = 0;
@@ -1177,7 +982,6 @@ async function startBot(loginWithEmail) {
             Array.isArray(getOwnerUids.data) &&
             getOwnerUids.data.length > 0
           ) {
-
             if (!global.BruxaBot.originalAdminBot) {
               global.BruxaBot.originalAdminBot = [
                 ...(global.BruxaBot.config.adminBot || []),
@@ -1186,29 +990,13 @@ async function startBot(loginWithEmail) {
 
             const ownerUids = getOwnerUids.data.map((uid) => uid.toString());
             global.BruxaBot.ownerUIDs = ownerUids;
-
-
-            global.BruxaBot.config.adminBot = global.BruxaBot.originalAdminBot;          
+            global.BruxaBot.config.adminBot = global.BruxaBot.originalAdminBot;
           }
         } catch (e) {
           // silent fall
         }
 
-        // ── Owner UIDs (silent) ──────────
-        try {
-          const adilbotapi = new global.utils.AdilBotApis();
-          const res = await adilbotapi.getOwnerUids();
-          if (res.success && Array.isArray(res.data) && res.data.length > 0) {
-            if (!global.BruxaBot.originalAdminBot)
-              global.BruxaBot.originalAdminBot = [
-                ...(global.BruxaBot.config.adminBot || []),
-              ];
-            global.BruxaBot.ownerUIDs = res.data.map((u) => u.toString());
-            global.BruxaBot.config.adminBot = global.BruxaBot.originalAdminBot;
-          }
-        } catch {}
-
-        // ── BotApis registration + socket ─────
+        // ── BotApis registration ────
         try {
           const { AdilBotApis } = global.utils;
           const adilApi = new AdilBotApis();
@@ -1289,7 +1077,7 @@ async function startBot(loginWithEmail) {
 
         // ── Copyright ─────────
         console.log(
-          `\x1b[1m\x1b[33mCOPYRIGHT:\x1b[0m\x1b[1m\x1b[36m BruxaBot v1 Reanimated by Rakib Adil | Inspired by ntkhang03 (GoatBot)\n GitHub: https://github.com/bruxa6t9 — Do not sell or claim as your own.\x1b[0m`,
+          `\x1b[1m\x1b[33mCOPYRIGHT:\x1b[0m\x1b[1m\x1b[36m BruxaBot Reanimated by Rakib Adil | Inspired by ntkhang03 (GoatBot)\n GitHub: https://github.com/bruxa6t9 — Do not sell or claim as your own.\x1b[0m`,
         );
         logColor("#f5ab00", character);
 
@@ -1301,10 +1089,6 @@ async function startBot(loginWithEmail) {
           global.client.dirConfigCommands,
           JSON.stringify(global.BruxaBot.configCommands, null, 2),
         );
-
-        // ── Start uptime server
-        await startUptimeServer();
-
         // ── MQTT listen ────────
         const { restartListenMqtt } = global.BruxaBot.config;
         let intervalCheckLiveCookieAndRelogin = false;
@@ -1393,7 +1177,6 @@ async function startBot(loginWithEmail) {
               return;
             }
 
-            // Closed gracefully by stopListening — ignore
             if (
               error === "Connection closed." ||
               error === "Connection closed by user."
@@ -1425,7 +1208,6 @@ async function startBot(loginWithEmail) {
           global.statusAccountBot = "good";
           if (isSendNotiErrorMessage) isSendNotiErrorMessage = false;
 
-          // Deduplicate messages (prevent double-firing from multiple listeners)
           if (event.messageID && event.type === "message") {
             if (storage5Message.includes(event.messageID)) {
               Object.keys(callbackListenTime)
@@ -1499,7 +1281,7 @@ async function startBot(loginWithEmail) {
         global.BruxaBot.Listening = api.listenMqtt(createCallBackListen());
         global.BruxaBot.callBackListen = callBackListen;
 
-        // ── MQTT periodic restart ───────────
+        // ── MQTT periodic restart ──────
         if (restartListenMqtt?.enable) {
           if (restartListenMqtt.logNoti) {
             log.info(
@@ -1543,7 +1325,6 @@ async function startBot(loginWithEmail) {
     );
   })(appState);
 
-  // ── Watch account.txt for external changes ────
   if (global.BruxaBot.config.autoReloginWhenChangeAccount) {
     setTimeout(() => {
       watch(dirAccount, async (type) => {

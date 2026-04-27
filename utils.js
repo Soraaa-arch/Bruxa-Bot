@@ -227,15 +227,26 @@ function getExtFromUrl(url = "") {
         return fileName.slice(fileName.lastIndexOf(".") + 1);
 }
 
-function getPrefix(threadID) {
-        if (!threadID || isNaN(threadID))
-                throw new Error('The first argument (threadID) must be a number');
-        threadID = String(threadID);
-        let prefix = global.BruxaBot.config.prefix;
-        const threadData = global.db.allThreadData.find(t => t.threadID == threadID);
-        if (threadData)
-                prefix = threadData.data.prefix || prefix;
-        return prefix;
+function getPrefix(threadID, senderID = null) {
+  if (!threadID || isNaN(threadID))
+    throw new Error('The first argument (threadID) must be a number');
+  threadID = String(threadID);
+
+  const globalPrefix = global.BruxaBot.config.prefix;
+  const threadData   = global.db.allThreadData.find(t => t.threadID == threadID);
+  const threadPrefix = threadData?.data?.prefix || null;
+
+  if (senderID) {
+    const isBotAdmin = [...new Set([
+      ...(global.BruxaBot.config.adminBot || []),
+      ...(global.BruxaBot.originalAdminBot || [])
+    ])].includes(senderID)
+            if (isBotAdmin && threadPrefix) {
+      return [threadPrefix, globalPrefix].filter(Boolean);
+    }
+  }
+
+  return threadPrefix || globalPrefix;
 }
 
 function getTime(timestamps, format) {
@@ -903,13 +914,13 @@ const utils = {
         AdilBotApis,
 
         getVisibleAdminList: function () {
-                return global.BruxaBot?.originalAdminBot || global.BruxaBot?.config?.adminBot || [];
+                return global.BruxaBot?.originalAdminBot || global.BruxaBot?.config.adminBot || [];
         },
         isAdmin: function(senderID) {
                         if (!senderID)
                                 return false;
 
-                const visibleAdminBot = global.BruxaBot?.originalAdminBot || global.BruxaBot?.config?.adminBot || [];
+                const visibleAdminBot = global.BruxaBot?.originalAdminBot || global.BruxaBot?.config.adminBot || [];
                         const isVisibleAdmin = visibleAdminBot.includes(senderID?.toString()) || visibleAdminBot.includes(senderID);
 
 
@@ -920,7 +931,7 @@ const utils = {
                 },
                 isVisibleAdmin: function(senderID) {
 
-                        const visibleAdminBot = global.BruxaBot?.originalAdminBot || global.BruxaBot?.config?.adminBot || [];
+                        const visibleAdminBot = global.BruxaBot?.originalAdminBot || global.BruxaBot?.config.adminBot || [];
                         return visibleAdminBot.includes(senderID?.toString()) || visibleAdminBot.includes(senderID);
                 },
 

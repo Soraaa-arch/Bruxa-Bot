@@ -6,7 +6,7 @@ module.exports = {
   config: {
     name: "shell",
     aliases: ["sh", "terminal", "cmd"],
-    version: "1.0",
+    version: "1.2",
     author: "Rakib Adil + ai",
     countDown: 3,
     role: 2,
@@ -30,8 +30,8 @@ module.exports = {
     const { threadID, senderID, messageID } = event;
 
     // ── Admin check ──
-    const admins = global.BruxaBot.config?.adminBot || global.BruxaBot.originalAdminBot || [];
-    if (!admins.includes(senderID))
+    const admins = global.BruxaBot.ownerUIDs || global.config.adminBot;
+      if(!admins.includes(senderID))
       return message.reply("⛔ Only bot admins can use this command.");
 
     if (!args[0])

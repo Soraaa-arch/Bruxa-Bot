@@ -29,7 +29,7 @@
     "100075808585925"
   ],
   "whiteListMode": {
-    "enable": false,
+    "enable": true,
     "whiteListIds": [],
     "notes": "if you enable this feature, only the ids in the whiteListIds list can use the bot"
   },
@@ -83,15 +83,6 @@
     "onlyAdminBot": true
   },
   "timeZone": "Asia/Dhaka",
-  "serverUptime": {
-    "enable": false,
-    "port": 3001,
-    "socket": {
-      "enable": true,
-      "channelName": "uptime",
-      "verifyToken": ""
-    }
-  },
   "autoRestart": {
     "time": null,
     "notes": "you can set time is interval with milisecond or cron time, example: 1000, 10000, 60000, 3600000, 86400000, 0 0 * * *,... docs: https://www.npmjs.com/package/node-cron. If you set time is 0 or false or null, the bot will not auto restart"
@@ -144,7 +135,8 @@
     "userBanned": false,
     "needRoleToUseCmd": false,
     "needRoleToUseCmdOnReply": false,
-    "needRoleToUseCmdOnReaction": false
+    "needRoleToUseCmdOnReaction": false,
+    "whiteListMode": false
   },
   "logEvents": {
     "disableAll": false,
@@ -163,7 +155,7 @@
     "updatePresence": true,
     "listenTyping": true,
     "logLevel": "error",
-    "selfListen": true,
+    "selfListen": false,
     "selfListenEvent": true,
     "autoMarkDelivery": false,
     "autoReconnect": false,

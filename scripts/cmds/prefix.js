@@ -4,90 +4,102 @@ const { utils } = global;
 module.exports = {
   config: {
     name: "prefix",
-    version: "2.0.1",
+    version: "2.1.2",
     author: "NTKhang || Rakib",
     countDown: 5,
     role: 0,
     description: "Change or view the bot prefix (thread/system)",
     category: "config",
     guide: {
-      en: "   {pn} <new prefix>: change new prefix in your box chat" +
+      en: "   {pn} <new prefix>: change prefix in your box chat (group admin only)" +
         "\n   Example:" +
         "\n    {pn} #" +
-        "\n\n   {pn} <new prefix> -g: change new prefix in system bot (only admin bot)" +
+        "\n\n   {pn} <new prefix> -g: change system prefix (bot admin only)" +
         "\n   Example:" +
         "\n    {pn} # -g" +
-        "\n\n   {pn} reset: change prefix in your box chat to default"
+        "\n\n   {pn} reset: reset prefix in your box chat to default"
     }
   },
 
   langs: {
     en: {
-      reset: "Your prefix has been reset to default: %1",
-      onlyAdmin: "Only Rakib can change prefix of system bot",
-      confirmGlobal: "Please react to this message to confirm change prefix of system bot",
-      confirmThisThread: "Please react to this message to confirm change prefix in your box chat",
-      successGlobal: "Changed prefix of system bot to: %1",
-      successThisThread: "Changed prefix in your box chat to: %1",
-      myPrefix: "🌐 System prefix: %1\n🛸 Your box chat prefix: %2\n🌩️ baka yare"
+      reset:             "Your prefix has been reset to default: %1",
+      onlyAdmin:         "Only bot admins can change the system prefix.",
+      onlyGroupAdmin:    "Only group admins can change the prefix in this chat.",
+      confirmGlobal:     "React to this message to confirm changing the system prefix.",
+      confirmThisThread: "React to this message to confirm changing the prefix in your chat.",
+      successGlobal:     "System prefix changed to: %1",
+      successThisThread: "Box chat prefix changed to: %1",
+      myPrefix:          "🌐 System prefix: %1\n🛸 Your box chat prefix: %2\n🌩️ bakayaro..👽"
     }
   },
 
-  onStart: async function({ message, role, args, commandName, event, threadsData, getLang }) {
-    if (!args[0])
-      return message.SyntaxError();
+  onStart: async function ({ message, role, args, commandName, event, threadsData, getLang }) {
+    const { threadID, senderID } = event;
 
-    if (args[0] == 'reset') {
-      await threadsData.set(event.threadID, null, "data.prefix");
+    if (!args[0]) return message.SyntaxError();
+
+    const isBotAdmin = [...new Set([...(global.BruxaBot.config.adminBot || []), ...(global.BruxaBot.originalAdminBot || [])])].includes(senderID);
+
+    const isGlobal = args[1] === "-g";
+
+    if (isGlobal) {
+      if (!isBotAdmin) return message.reply(getLang("onlyAdmin"));
+    } else {    
+      if (role < 1 && !isBotAdmin)
+        return message.reply(getLang("onlyGroupAdmin"));
+    }
+
+    if (args[0] === "reset") {
+      await threadsData.set(threadID, null, "data.prefix");
       return message.reply(getLang("reset", global.BruxaBot.config.prefix));
     }
 
     const newPrefix = args[0];
-    const formSet = {
+    const formSet   = {
       commandName,
-      author: event.senderID,
+      author:    senderID,
       newPrefix,
-      role: 1
+      setGlobal: isGlobal,
+      role:      1
     };
 
-    if (args[1] === "-g")
-      if (role < 2)
-        return message.reply(getLang("onlyAdmin"));
-      else
-        formSet.setGlobal = true;
-    else
-      formSet.setGlobal = false;
-
-    return message.reply(args[1] === "-g" ? getLang("confirmGlobal") : getLang("confirmThisThread"), (err, info) => {
-      formSet.messageID = info.messageID;
-      global.BruxaBot.onReaction.set(info.messageID, formSet);
-    });
+    return message.reply(
+      isGlobal ? getLang("confirmGlobal") : getLang("confirmThisThread"),
+      (err, info) => {
+        if (err || !info?.messageID) return;
+        formSet.messageID = info.messageID;
+        global.BruxaBot.onReaction.set(info.messageID, formSet);
+      }
+    );
   },
 
-  onReaction: async function({ message, threadsData, event, Reaction, getLang }) {
-    const { author, newPrefix, setGlobal } = Reaction;
-    if (event.userID !== author)
-      return;
+  onReaction: async function ({ message, threadsData, event, Reaction, getLang }) {
+    const { author, newPrefix, setGlobal, messageID } = Reaction;
+
+    if (event.userID !== author) return;
+
     if (setGlobal) {
       global.BruxaBot.config.prefix = newPrefix;
       fs.writeFileSync(global.client.dirConfig, JSON.stringify(global.BruxaBot.config, null, 2));
+      await message.unsend(messageID);
       return message.reply(getLang("successGlobal", newPrefix));
-message.unsend(Reaction.messageID);
-    }
-    else {
+    } else {
       await threadsData.set(event.threadID, newPrefix, "data.prefix");
+      await message.unsend(messageID);
       return message.reply(getLang("successThisThread", newPrefix));
     }
   },
 
-  onChat: async function({ event, message, getLang }) {
+  onChat: async function ({ event, message, getLang }) {
+    if (event.body && event.body.toLowerCase() === "prefix") {
+      const threadPrefix = global.db.allThreadData
+        .find(t => t.threadID == event.threadID)?.data?.prefix || null;
+      const globalPrefix = global.BruxaBot.config.prefix;
 
-
-    if (event.body && event.body.toLowerCase() === "prefix")
-      return () => {
-        return message.reply({
-          body: getLang("myPrefix", global.BruxaBot.config.prefix, utils.getPrefix(event.threadID))
-        });
-      };
+      return message.reply({
+        body: getLang("myPrefix", globalPrefix, threadPrefix || globalPrefix, event.threadID, event.messageID)
+      });
+    }
   }
 };

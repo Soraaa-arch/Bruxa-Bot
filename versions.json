@@ -46,7 +46,7 @@
       "bot/login/login.js": "modified commamd initialization..",
       "bot/login/loadScript.js": "modified command initializing..",
       "updater.js": "modified updater.js to update all files..",
-      "README.md"
+      "README.md": "readme.md"
     },
     "addFiles": {
       "scripts/cmds/uptime.js": "added new command named uptime.js"
@@ -116,7 +116,33 @@
       "config.json": "removed dashboard option.."
     },
     "deleteFiles": {
-      "dashboard": "removed this unnecessary folder.."
+      "dashboard": "removed this unnecessary folder..",
+      "scripts/cmds/ytb.js": "delete ytb.js"
+    }
+  },
+  {
+    "version": "1.0.11",
+    "updateFiles": {
+      "utils.js": "null",
+      "bot/login/login.js": "removed uptime option..",
+      "bot/handler/handlerEvents.js": "fixed role mixing issue..",
+      "scripts/cmds/sh.js": "fixed",
+      "scripts/cmds/prefix.js": "upgraded to new features..",
+      "scripts/cmds/help.js": "updated to a beautiful list showing desing..",
+      "Bruxa.js": "just a little bit of changes..",
+      "scripts/cmds/shizuka.js": "fixed some typo err..",
+      "scripts/cmds/cmd.js": "added delete function..",
+      "config.json": ""
+    },
+    "deleteFiles": {
+      "bot/login/cookiesExtract.js": "removed cookies extractor.. ",
+      "scripts/cmds/gpt.js": "removed cuz won't work..",
+      "scripts/cmds/texttoimage.js": "removed old mj by ntkhang"
+    },
+    "addFiles": {
+      "scripts/cmds/pp.js": "get users profile pic or self..",
+      "scripts/cmds/whitelistonly": "added white list user only cmd..",
+      "scripts/cmds/waifu.js": "added waifu cmd.."
     }
   }
 ]

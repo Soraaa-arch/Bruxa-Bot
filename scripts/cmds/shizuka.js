@@ -203,7 +203,7 @@ module.exports = {
   config: {
     name: 'shizuka',
     aliases: ['bby', 'baby'],
-    version: '2.1.10',
+    version: '2.1.11',
     author: 'Rakib Adil',
     countDown: 5,
     role: 0,
@@ -218,7 +218,7 @@ module.exports = {
 
   onStart: async function ({ api, args, event }) {
     const { threadID, messageID, senderID } = event;
-    const input = args.join(' ').trim();
+    const input = args.join(' ').trim().toLowerCase();
 
     const cmd = input.match(/^(teach|msg|allteach|teachers|mystats)/);
 

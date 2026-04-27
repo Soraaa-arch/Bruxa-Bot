@@ -228,7 +228,7 @@ setInterval(() => {
 			admins: new Set()
 		};
 		utils.log.master("NEW VERSION", getText(
-			"Goat",
+			"Bruxa",
 			"newVersionDetected",
 			colors.gray(currentVersion),
 			colors.hex("#eb6a07", version),

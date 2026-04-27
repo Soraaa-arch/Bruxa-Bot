@@ -126,7 +126,7 @@
       "utils.js": "null",
       "bot/login/login.js": "removed uptime option..",
       "bot/handler/handlerEvents.js": "fixed role mixing issue..",
-      "scripts/cmds/sh.js": "fixed",
+      "scripts/cmds/shell.js": "fixed",
       "scripts/cmds/prefix.js": "upgraded to new features..",
       "scripts/cmds/help.js": "updated to a beautiful list showing desing..",
       "Bruxa.js": "just a little bit of changes..",

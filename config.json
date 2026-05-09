@@ -13,7 +13,7 @@
   "language": "en",
   "notesLanguage": "change to your language with ISO 639-1 code, available languages: vi (Vietnamese), en (English)",
   "showTitle": false,
-  "nickNameBot": "BruxaBot",
+  "nickNameBot": "Kiv",
   "prefix": "/",
   "bio": {
     "enabled": true,
@@ -25,8 +25,7 @@
     "ignoreCommand": []
   },
   "adminBot": [
-    "100042067216561",
-    "100075808585925"
+    "61576612175253"
   ],
   "whiteListMode": {
     "enable": true,
@@ -36,7 +35,7 @@
   "whiteListModeThread": {
     "enable": true,
     "whiteListThreadIds": [
-      "8364250807012864"
+      ""
     ],
     "notes": "if you enable this feature, only the thread in the whiteListThreadIds list can use the bot",
     "how_it_work": "if you enable both whiteListMode and whiteListModeThread, the system will check if the user is in whiteListIds, then check if the thread is in whiteListThreadIds, if one of the conditions is true, the user can use the bot"
@@ -58,12 +57,12 @@
     "threadId": {
       "enabled": false,
       "threads": [
-        "8364250807012864"
+        ""
       ]
     },
     "adminId": {
       "enabled": true,
-      "admin": "100075808585925"
+      "admin": "61576612175253"
     },
     "message": "🤖 Bot is online..📢",
     "notes": "You can set the message to be sent when the bot is connected.."

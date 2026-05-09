@@ -104,18 +104,14 @@ module.exports = {
       helpMessage += "╭────────────◊\n";
       helpMessage += "│ » Type [ /help <cmd> ] for usage\n";
       helpMessage += "│ » Type [ /help | category ] for category cmds\n";
-      helpMessage += "│ » Owner Contact: m.me/aest.adil.69\n";
-      helpMessage += "│ » Join Support GC: https://m.me/j/Aba6v1ykZinwoXSR/\n";
+      helpMessage += "│ » Owner Contact: https://web.facebook.com/61576612175253\n";
+      helpMessage += "│ » Join Support GC: https://web.facebook.com/messages/t/7810828065650086\n";
       helpMessage += "╰────────────◊\n";
-      helpMessage += "          「 💫 RAKIB_BOT 😗 」";
+      helpMessage += "          「  KIV BOT 」";
       
       /* Add your video/image/gif URL here
       const imgUrl =[
-        "https://files.catbox.moe/zaubmg.jpg",
-        "https://files.catbox.moe/ngyn3o.jpg",
-        "https://files.catbox.moe/kwlxeg.jpg",
-        "https://files.catbox.moe/2qc1d3.jpg",
-        "https://files.catbox.moe/ks1jtd.jpg"
+        
       ];
       
      // const rndmImg = imgUrl[Math.floor(Math.random() * imgUrl.length)];

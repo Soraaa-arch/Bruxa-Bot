@@ -89,7 +89,7 @@ module.exports = {
         if (command.config.aliases?.length) details += `│ 🔄 Aliases: ${command.config.aliases.join(', ')}\n`;
         if (command.config.countDown !== undefined) details += `│ ⏱️ Cooldown: ${command.config.countDown}s\n`;
         details += `│🧬 Usage: ${usage}\n`
-        details += `╰───────────────────◊\n💫 RAKIB_BOT Command Info`;
+        details += `╰───────────────────◊\n💫 KIV BOT Command Info`;
         return sendMessage(details);
       }
       
